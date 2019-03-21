@@ -11,8 +11,7 @@ void setup() {
   c[1][2] = 50;
   c[0][3] = 450; //BR
   c[1][3] = 450;
-  strokeWeight(7);
-  translate(100,500);
+  strokeWeight(3);
 }
 boolean tempA = true;
 int posX=0;
@@ -48,7 +47,7 @@ void draw() {
             xyGroup = i;
             clear();
             background(255);
-            bezier(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
+            curve(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
             fill(0);
             ellipse(c[0][0], c[1][0], D, D);
             ellipse(c[0][1], c[1][1], D, D);
@@ -63,13 +62,13 @@ void draw() {
         //255 is white
         stroke(255);
         fill(255);
-        bezier(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
+        curve(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
         ellipse(c[0][xyGroup], c[1][xyGroup], D, D);
         c[0][xyGroup]=mouseX;
         c[1][xyGroup]=mouseY;
         //draw
         stroke(0);
-        bezier(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
+        curve(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
         fill(0);
         ellipse(c[0][xyGroup], c[1][xyGroup], D, D);
       }
@@ -92,69 +91,8 @@ void draw() {
       stroke(0);
       fill(0);
       fill(255, 0);
-      bezier(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
-      //Visualization
-
-      //First 3 basic lines
-      for (int i=0; i<3; i++) {
-        stroke(0, 255, 150);
-        line(c[0][i], c[1][i], c[0][i+1], c[1][i+1]);
-        float pointX1 = (1-t)*c[0][i]+t*c[0][i+1];
-        float pointY1 = (1-t)*c[1][i]+t*c[1][i+1];
-        fill(255);
-        stroke(255);
-        ellipse(prevX[i], prevY[i], D, D);
-        stroke(255, 140, 0);
-        fill(255, 140, 0);
-        ellipse(pointX1, pointY1, D, D);
-        prevPrevX[i] = prevX[i];
-        prevPrevY[i] = prevY[i];
-        prevX[i] = pointX1;
-        prevY[i] = pointY1;
-      }
-
-      //2 "parent" lines
-      for (int i=0; i<2; i++) {
-        stroke(255);
-        t-=0.002;
-        line(prevPrevX[i], prevPrevY[i], prevPrevX[i+1], prevPrevY[i+1]);
-        stroke(255, 140, 0);
-        t+=0.002;
-        line(prevX[i], prevY[i], prevX[i+1], prevY[i+1]);
-        float pointX1 = (1-t)*prevX[i]+t*prevX[i+1];
-        float pointY1 = (1-t)*prevY[i]+t*prevY[i+1];
-        fill(255);
-        stroke(255);
-        ellipse(prevX2[i], prevY2[i], D, D);
-        stroke(255, 100, 0);
-        fill(255, 100, 0);
-        ellipse(pointX1, pointY1, D, D);
-        prevPrevX2[i] = prevX2[i];
-        prevPrevY2[i] = prevY2[i];
-        prevX2[i] = pointX1;
-        prevY2[i] = pointY1;
-      }
-      stroke(255);
-      t-=0.002;
-      //erases previous line
-      line(prevPrevX2[0], prevPrevY2[0], prevPrevX2[1], prevPrevY2[1]);
-      stroke(255, 50, 0);
-      t+=0.002;
-      //creates next line
-      line(prevX2[0], prevY2[0], prevX2[1], prevY2[1]);
-      float pointX1 = (1-t)*prevX2[0]+t*prevX2[0+1];
-      float pointY1 = (1-t)*prevY2[0]+t*prevY2[0+1];
-      fill(255);
-      stroke(255);
-      ellipse(prevX3, prevY3, 1.3*D, 1.3*D);
-      stroke(255, 100, 0);
-      prevX3 = pointX1;
-      prevY3 = pointY1;
-
-      t+=0.0015;
-      if (t>1.0) {
-        t=0;
-      }
+      curve(c[0][0], c[1][0], c[0][1], c[1][1], c[0][2], c[1][2], c[0][3], c[1][3]);
+      
       stroke(0);
       fill(0);
       ellipse(c[0][0], c[1][0], D, D);
@@ -163,7 +101,6 @@ void draw() {
       ellipse(c[0][3], c[1][3], D, D);
       noStroke();
       fill(148, 0, 211);
-      ellipse(pointX1, pointY1, 1.3*D, 1.3*D);
       fill(255);
       stroke(0);
     }
