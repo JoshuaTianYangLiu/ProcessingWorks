@@ -117,7 +117,7 @@ public class ImageToProcessing {
                             //16776960
                             System.out.printf("%d %d, %d, %d, %d\n",p,a,r,g,b);
                             if(pixelSize<=1){
-                                if(movement)printWriter.printf("col(%d,%d,%d);\npoint(x+%d,y+%d);\n",r,g,b,i,j);
+                                if(movement)printWriter.printf("stroke(%d,%d,%d);\nfill(%d,%d,%d);\npoint(%d+characterX,%d+characterY);\n",r,g,b,r,g,b,i,j);
                                 else printWriter.printf("col(%d,%d,%d);\npoint(%d,%d);\n",r,g,b,i,j);
                             }else{
                                 if(movement)printWriter.printf("stroke(%d,%d,%d);\nfill(%d,%d,%d);\nrect(%d+characterX,%d+characterY,%d,%d);\n",r,g,b,r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);

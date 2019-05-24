@@ -1,4 +1,4 @@
-int currentWindow=0;
+int currentWindow=1;
 int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
@@ -39,7 +39,8 @@ void draw() {
     if (currentWindow==2) {
     } else if (currentWindow==3) {
     } else if (currentWindow==4) {
-      background(100);
+      strokeWeight(1);
+      background(200);
       stroke(200);
       fill(200);
       rect(colourSquareX, colourSquareY, 255, 255);
@@ -48,11 +49,9 @@ void draw() {
     } else if (currentWindow==5) {
     } else if (currentWindow==6) {
     }
-  }else if(currentWindow==2){
-  
-  }else if(currentWindow==3){
-  
-  }else if(currentWindow==4){
+  } else if (currentWindow==2) {
+  } else if (currentWindow==3) {
+  } else if (currentWindow==4) {
     colourPicker();
   }
 }
@@ -65,10 +64,11 @@ void drawColourSquare() {
   }
 }
 void colourPicker() {
-  //This is to provide the redrawing a solid background when it draws over the pointer
-  stroke(100);
-  fill(100);
-  rect(colourSquareX+max(s-3, -3), colourSquareY+255-max(b-3, -3), min(6, s+3), -1*min(6, b+3));
+  characterX=0;
+  characterY=100;
+  stroke(200);
+  fill(200);
+  rect(colourSquareX+s-3, colourSquareY+255-b+3, 6, -6);
 
   //This is to match the pixels that the pointer was on
   colorMode(HSB);
@@ -78,8 +78,6 @@ void colourPicker() {
       point(i+colourSquareX, 255+colourSquareY-j);
     }
   }
-  characterX=0;
-  characterY=0;
   stroke(100, 100, 200);
   fill(100, 100, 200);
   rect(450, 90, 200, 50);
@@ -116,7 +114,7 @@ void colourPicker() {
     characterHairTwo=color(h, s, b*.9);
     stroke(150, 255, 255);
     fill(150, 255, 255);
-    rect(450, 15, 200, 50);//TODO Change the colour of the selected rectangle to a more appeasing colour
+    rect(450, 15, 200, 50);//TODO change it to a more appeasing colour
   } else {
     characterPantsOne=color(h, s, b);
     characterPantsTwo=color(h, s, b*.65);
@@ -133,12 +131,10 @@ void colourPicker() {
   colourPickerSample();
 
   colorMode(HSB);
-  //Coords of the colour square (300,100) (555,355)
   for (int i=0; i<256; i++) {
     stroke(i, 255, 255);
     line(colourSquareX+300, i+colourSquareY, colourSquareX+325, i+colourSquareY);
   }
-  //Coords of the side scale  (600,100) (625,355)
   if (mousePressed) {
     if (mouseX<=colourSquareX+255&&mouseX>=colourSquareX&&mouseY<=colourSquareY+255&&mouseY>=colourSquareY) {  //The square
       s=mouseX-colourSquareX;
@@ -164,6 +160,17 @@ void colourPicker() {
   fill(255);
   line(colourSquareX+300, h+colourSquareY, colourSquareX+325, h+colourSquareY);
   ellipse(s+colourSquareX, colourSquareY+255-b, 5, 5);
+
+  //Main menu
+  if (mouseX>=550&&mouseX<=750&&mouseY>=425&&mouseY<=475) {
+    fill(100,200,200);
+    stroke(100,200,200);
+    if (mousePressed) currentWindow=1;
+  }
+  textSize(30);
+  rect(550, 425, 200, 50);
+  fill(100, 100, 200);
+  text("Main Menu", 575, 460);
 }
 void mainMenu() {
   background(bg);
@@ -227,7 +234,7 @@ void mainMenu() {
     text("Quit", 370, 435);
     if (mousePressed) currentWindow=6;
   } else {
-    mainMenuBoxes=150;
+    mainMenuBoxes=100;
   }
 }
 void splashScreen() {
