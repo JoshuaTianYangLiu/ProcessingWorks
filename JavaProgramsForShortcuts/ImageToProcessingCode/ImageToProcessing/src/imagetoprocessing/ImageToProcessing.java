@@ -79,7 +79,7 @@ public class ImageToProcessing {
                             if(movement)printWriter.printf("col(%d,%d,%d);\npoint(x+%d,y+%d);\n",r,g,b,i,j);
                             else printWriter.printf("col(%d,%d,%d);\npoint(%d,%d);\n",r,g,b,i,j);
                         }else{
-                            if(movement)printWriter.printf("col(%d,%d,%d);\rect(%d*x,%d*y,%d,%d);\n",r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);
+                            if(movement)printWriter.printf("col(%d,%d,%d);\nrect(%d+x,%d+y,%d,%d);\n",r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);
                             else printWriter.printf("col(%d,%d,%d);\nrect(%d,%d,%d,%d);\n",r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);
                         }
                         printWriter1.printf("%d %d, %d, %d, %d\n",p,a,r,g,b);
@@ -120,7 +120,7 @@ public class ImageToProcessing {
                                 if(movement)printWriter.printf("col(%d,%d,%d);\npoint(x+%d,y+%d);\n",r,g,b,i,j);
                                 else printWriter.printf("col(%d,%d,%d);\npoint(%d,%d);\n",r,g,b,i,j);
                             }else{
-                                if(movement)printWriter.printf("col(%d,%d,%d);\rect(%d*x,%d*y,%d,%d);\n",r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);
+                                if(movement)printWriter.printf("stroke(%d,%d,%d);\nfill(%d,%d,%d);\nrect(%d+characterX,%d+characterY,%d,%d);\n",r,g,b,r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);
                                 else printWriter.printf("col(%d,%d,%d);\nrect(%d,%d,%d,%d);\n",r,g,b,pixelSize*i,pixelSize*j,pixelSize-1,pixelSize-1);
                             }
                             printWriter1.printf("%d %d, %d, %d, %d\n",p,a,r,g,b);
