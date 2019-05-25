@@ -8,32 +8,51 @@ color characterPantsThree=color(56, 104, 176);
 int playerMap[][]=new int[25][13];
 //0 floor
 //1 wall
+//2 locked box
+//3 unlocked box
+//4 note
+PImage lockedBox,unlockedBox,note;
 void setup() {
   size(800, 500);
   background(100);
+  lockedBox=loadImage("LockedBox.png");
+  unlockedBox=loadImage("UnlockedBox.png");
+  note = loadImage("Note.png");
   for (int i=0; i<25; i++)playerMap[i][0]=1;
   for (int i=0; i<25; i++)playerMap[i][12]=1;
   for (int i=0; i<13; i++)playerMap[0][i]=1;
   for (int i=0; i<13; i++)playerMap[24][i]=1;
+  playerMap[5][7]=2;
+  playerMap[6][8]=3;
+  playerMap[15][3]=4;
 }
 boolean hasControl=true;
 void draw() {
-  int cnt=0;
   for (int i=0; i<25; i++) {
     for (int j=0; j<13; j++) {
-      if (playerMap[i][j]==0) {
+      if (playerMap[i][j]!=1) {
         if ((i+j)%2==0) {
-          stroke(100, 200, 100);
-          fill(100, 200, 100);
+          stroke(#000080);
+          fill(#000080);
+          rect(32*i, 32*j, 31, 31);
         } else {
-          stroke(100, 100, 200);
-          fill(100, 100, 200);
+          stroke(#add8e6);
+          fill(#add8e6);
+          rect(32*i, 32*j, 31, 31);
         }
-      } else if (playerMap[i][j]==1) {
+      }
+      if (playerMap[i][j]==1) {
         stroke(200);
         fill(200);
+        rect(32*i, 32*j, 31, 31);
+      }else if(playerMap[i][j]==2){
+        image(lockedBox,32*i,32*j);
+      }else if(playerMap[i][j]==3){
+        image(unlockedBox,32*i,32*j);
+      }else if(playerMap[i][j]==4){
+        image(note,32*i,32*j);
       }
-      rect(32*i, 32*j, 31, 31);
+      
     }
   } 
 
@@ -44,6 +63,7 @@ int moveCharacterFrame=0;
 int moveCharacterMoves=0;
 int characterGridX=0;
 int characterGridY=0;
+
 void moveCharacter() {
 
   if (hasControl) {
@@ -132,7 +152,7 @@ void moveCharacter() {
         }
       }
     }
-    moveCharacterFrame%=3;//This will be the FPS of the character
+    moveCharacterFrame%=1;//This will be the FPS of the character
     if (moveCharacterMoves==16)hasControl=true;
   }
   println(characterGridX+" "+characterGridY);
