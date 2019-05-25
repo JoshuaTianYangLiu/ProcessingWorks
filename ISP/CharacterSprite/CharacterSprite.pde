@@ -1,28 +1,39 @@
-int characterX=0;
-int characterY=0;
+int characterX=5*32;
+int characterY=5*32;
 color characterHairOne=color(152, 104, 88);
 color characterHairTwo=color(104, 72, 56);
 color characterPantsOne=color(99, 173, 242);
 color characterPantsTwo=color(72, 104, 176);
 color characterPantsThree=color(56, 104, 176);
-
+int playerMap[][]=new int[25][13];
+//0 floor
+//1 wall
 void setup() {
   size(800, 500);
   background(100);
+  for (int i=0; i<25; i++)playerMap[i][0]=1;
+  for (int i=0; i<25; i++)playerMap[i][12]=1;
+  for (int i=0; i<13; i++)playerMap[0][i]=1;
+  for (int i=0; i<13; i++)playerMap[24][i]=1;
 }
 boolean hasControl=true;
 void draw() {
   int cnt=0;
   for (int i=0; i<25; i++) {
-    for (int j=0; j<15; j++) {
-      if (cnt++%2==0) {
-        stroke(100, 200, 100);
-        fill(100, 200, 100);
-      } else {
-        stroke(100, 100, 200);
-        fill(100, 100, 200);
+    for (int j=0; j<13; j++) {
+      if (playerMap[i][j]==0) {
+        if ((i+j)%2==0) {
+          stroke(100, 200, 100);
+          fill(100, 200, 100);
+        } else {
+          stroke(100, 100, 200);
+          fill(100, 100, 200);
+        }
+      } else if (playerMap[i][j]==1) {
+        stroke(200);
+        fill(200);
       }
-      rect(32*i, 32*j, 32, 32);
+      rect(32*i, 32*j, 31, 31);
     }
   } 
 
@@ -31,6 +42,8 @@ void draw() {
 char lastMove='d';
 int moveCharacterFrame=0;
 int moveCharacterMoves=0;
+int characterGridX=0;
+int characterGridY=0;
 void moveCharacter() {
 
   if (hasControl) {
@@ -56,6 +69,8 @@ void moveCharacter() {
         hasControl=false;
       }
     }
+    characterGridX=characterX/32;
+    characterGridY=characterY/32;
     moveCharacterMoves=0;
     moveCharacterFrame=0;
   } else {
@@ -64,36 +79,63 @@ void moveCharacter() {
         moveCharacterMoves++;
         characterY-=2;
       }
-        if (moveCharacterMoves%2==0) characterBackOne();
-        else characterBackTwo();
+      if (moveCharacterMoves%2==0) characterBackOne();
+      else characterBackTwo();
+      if (playerMap[characterGridX][characterGridY-1]!=0) {
+
+        if (moveCharacterMoves>4) {
+          characterY+=10;
+          hasControl=true;
+        }
+      }
     }
     if (lastMove=='a') {
       if (moveCharacterFrame++==0) {
         moveCharacterMoves++;
         characterX-=2;
       }
-        if (moveCharacterMoves%2==0) characterLeftOne();
-        else characterLeftTwo();
+      if (moveCharacterMoves%2==0) characterLeftOne();
+      else characterLeftTwo();
+      if (playerMap[characterGridX-1][characterGridY]!=0) {
+
+        if (moveCharacterMoves>4) {
+          characterX+=10;
+          hasControl=true;
+        }
+      }
     }
     if (lastMove=='s') {
       if (moveCharacterFrame++==0) {
         moveCharacterMoves++;
         characterY+=2;
       }
-        if (moveCharacterMoves%2==0) characterFwdOne();
-        else characterFwdTwo();
+      if (moveCharacterMoves%2==0) characterFwdOne();
+      else characterFwdTwo();
+      if (playerMap[characterGridX][characterGridY+1]!=0) {
+        if (moveCharacterMoves>4) {
+          characterY-=10;
+          hasControl=true;
+        }
+      }
     }
     if (lastMove=='d') {
       if (moveCharacterFrame++==0) {
         moveCharacterMoves++;
         characterX+=2;
       }
-        if (moveCharacterMoves%2==0) characterRightOne();
-        else characterRightTwo();
+      if (moveCharacterMoves%2==0) characterRightOne();
+      else characterRightTwo();
+      if (playerMap[characterGridX+1][characterGridY]!=0) {
+        if (moveCharacterMoves>4) {
+          characterX-=10;
+          hasControl=true;
+        }
+      }
     }
-    moveCharacterFrame%=3;
-    if(moveCharacterMoves==16)hasControl=true;
+    moveCharacterFrame%=3;//This will be the FPS of the character
+    if (moveCharacterMoves==16)hasControl=true;
   }
+  println(characterGridX+" "+characterGridY);
 }
 void characterFwdIdle() {
   stroke(0, 0, 0);
