@@ -45,10 +45,10 @@ boolean hasMenuOpen=false;
 String noteMessage="";
 void draw() {
   background(100);
-  drawMap();
-  notePopup();
+  drawMap();  //This can be moved to every room
+  notePopup();  //This as well
   if(!hasMenuOpen){
-  moveCharacter();
+  moveCharacter();  //And this
   }
 }
 char lastMove='d';
@@ -81,7 +81,7 @@ void notePopup(){
       text("Press any key to continue...",200,425);
     }
     fill(0);
-    text(noteMessage,150,100);
+    text(noteMessage+"_",150,100);
     if(mousePressed||(keyPressed&&key!=' '))hasMenuOpen=false;
   }
 }
