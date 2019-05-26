@@ -6,6 +6,7 @@ color characterPantsOne=color(99, 173, 242);
 color characterPantsTwo=color(72, 104, 176);
 color characterPantsThree=color(56, 104, 176);
 int playerMap[][]=new int[25][13];
+String noteMap[][]=new String[25][13];
 //0 floor
 //1 wall
 //2 locked box
@@ -25,11 +26,23 @@ void setup() {
   playerMap[5][7]=2;
   playerMap[6][8]=3;
   playerMap[15][3]=4;
+  noteMap[15][3]="Hello World\n123";
   playerMap[12][3]=4;
+  noteMap[12][3]="123\nHello World";
   playerMap[8][3]=4;
+  noteMap[8][3]="Lorem Ipsum is simply dummy text\n"
+               +"of the printing and typesetting\n"
+               +"industry. Lorem Ipsum has been\n"
+               +"the industry's standard dummy \n"
+               +"text ever since the 1500s, when\n"
+               +"an unknown printer took a galley\n"
+               +"of type and scrambled it to make a\n"
+               +"type specimen book. It has ";
+  
 }
 boolean hasControl=true;
 boolean hasMenuOpen=false;
+String noteMessage="";
 void draw() {
   background(100);
   drawMap();
@@ -51,12 +64,24 @@ void notePopup(){
   else if(lastMove=='s')squareY++;
   else if(lastMove=='d')squareX++;
   if(playerMap[squareX][squareY]==4){
-    if(keyPressed&&key==' '){
+    if(keyPressed&&key==' '&&!hasMenuOpen){
       hasMenuOpen=true;
+      noteMessage="";
     }
   }
   if(hasMenuOpen){
     image(paperNote,0,0);
+    PFont font = loadFont("YuGothicUI-Bold-48.vlw");
+    textFont(font);
+    textSize(30);
+    if(noteMessage.length()!=noteMap[squareX][squareY].length())
+      noteMessage+=noteMap[squareX][squareY].charAt(noteMessage.length());
+    else {
+      fill(100);
+      text("Press any key to continue...",200,425);
+    }
+    fill(0);
+    text(noteMessage,150,100);
     if(mousePressed||(keyPressed&&key!=' '))hasMenuOpen=false;
   }
 }
