@@ -23,6 +23,22 @@ int moveCharacterFrame=0;
 int moveCharacterMoves=0;
 int characterGridX=0;
 int characterGridY=0;
+PImage lockedBox, unlockedBox, note, paperNote;
+String noteMap[][]=new String[25][13];
+int lockPassKey[][]=new int[25][13];
+int finalValue[]=new int[4];
+int curValue[] = new int[4];
+int scrollX[] = new int[4];
+int distance[] = new int[4];
+int colourSection=0;
+int shackleY=0;
+int numComb=0;
+int playerBar[]=new int[4];
+int numOfItems=0;
+int itemMap[][]=new int[25][13];
+boolean hasMenuOpen=false;
+String noteMessage;
+boolean hasUnlocked;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -48,11 +64,8 @@ void draw() {
   } else if (currentWindow==1) {
     mainMenu();
     if (currentWindow==2) {
-      characterX=5*32;
-      characterY=5*32;
       strokeWeight(1);
       size(800, 500);
-      background(100);
       for (int i=0; i<25; i++)playerMap[i][0]=1;
       for (int i=0; i<25; i++)playerMap[i][12]=1;
       for (int i=0; i<13; i++)playerMap[0][i]=1;
@@ -72,8 +85,14 @@ void draw() {
   } else if (currentWindow==2) {
     playGame();
     if (currentWindow==7) {
-      characterX=32*5;
-      characterY=32*5;
+      background(100);
+      lockedBox=loadImage("LockedBox.png");
+      unlockedBox=loadImage("UnlockedBox.png");
+      note = loadImage("Note.png");
+      paperNote=loadImage("NotePopup.png");
+      characterX=32;
+      characterY=32;
+      setupRoomOne();
     }
     //Most likely this will switch to multiple methods needing multiple values for each room
   } else if (currentWindow==3) {
@@ -88,8 +107,185 @@ void draw() {
   }
 }
 void roomOne() {  //This will most likely have to change
-  drawPlayerMap();
+  drawMap();
   moveCharacter();
+  guiPopup();
+}
+void guiPopup() {
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  if (lastMove=='w')squareY--;
+  else if (lastMove=='a')squareX--;
+  else if (lastMove=='s')squareY++;
+  else if (lastMove=='d')squareX++;
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);
+  println(squareX+" "+squareY);
+  if (playerMap[squareX][squareY]==4) {
+    if (keyPressed&&key==' '&&!hasMenuOpen) {
+      hasMenuOpen=true;
+      noteMessage="";
+    }
+    if (hasMenuOpen) {
+      image(paperNote, 0, 0);
+      PFont font = loadFont("YuGothicUI-Bold-48.vlw");
+      textFont(font);
+      textSize(30);
+      if (noteMessage.length()!=noteMap[squareX][squareY].length())
+        noteMessage+=noteMap[squareX][squareY].charAt(noteMessage.length());
+      else {
+        fill(100);
+        text("Press any key to continue...", 200, 425);
+      }
+      fill(0);
+      text(noteMessage+"_", 150, 100);
+      if (mousePressed||(keyPressed&&key!=' '))hasMenuOpen=false;
+    }
+  } else if (playerMap[squareX][squareY]==2) {
+    if (keyPressed&&key==' '&&!hasMenuOpen) {
+      hasMenuOpen=true;
+      for (int i=0; i<4; i++) {
+        finalValue[i]=0;
+        curValue[i]=0;
+        scrollX[i]=0;
+        distance[i]=0;
+      }
+      colourSection=0;
+      shackleY=0;
+      numComb=0;
+      hasUnlocked=false;
+    }
+    if (hasMenuOpen) {
+      textSize(20);
+      strokeWeight(28);
+      noFill();
+      stroke(0);
+      if (hasUnlocked) {
+        stroke(100, 200, 100);
+      }
+      arc(400, 150-shackleY, 200, 200, PI, 2*PI);
+      line(300, 150-shackleY, 300, 200);
+      line(500, 150-shackleY, 500, 200-shackleY);
+      strokeWeight(1);
+      fill(0);
+      if (hasUnlocked) {
+        fill(100, 200, 100);
+      }
+      rect(250, 200, 300, 200, 14);
+      strokeWeight(2);
+      stroke(255);
+      line(270, 292, 280, 292);
+      line(520, 292, 530, 292);
+      strokeWeight(1);
+      if (!hasUnlocked) {
+        int wheelNum=(mouseX-305)/50;
+        if (wheelNum>=0&&wheelNum<=3&&mouseX>=30&&mouseX<=495) {
+
+          if (mousePressed) {
+            distance[wheelNum]=scrollX[wheelNum]-mouseY;
+            distance[wheelNum]/=15;
+            if (distance[wheelNum]<0)distance[wheelNum]+=10;
+            distance[wheelNum]%=10;
+            curValue[wheelNum]=distance[wheelNum]+finalValue[wheelNum];
+          } else {
+            scrollX[wheelNum]=mouseY;
+            finalValue[wheelNum]=curValue[wheelNum];
+          }
+          if (curValue[wheelNum]<0)curValue[wheelNum]+=10;
+          curValue[wheelNum]%=10;
+        }
+      } else {
+        shackleY=min(40, shackleY+2);
+        if (shackleY==40) {
+          hasMenuOpen=false;
+          delay(2000);
+          playerMap[squareX][squareY]=itemMap[squareX][squareY];
+        }
+      }
+      numComb=0;
+      boolean isInOneSection=false;
+      for (int j=0; j<4; j++) {
+
+        if (mouseX>=305+50*j&&mouseX<=345+50*j&&(mousePressed||(mouseY>=250&&mouseY<=340))&&!hasUnlocked) {
+          isInOneSection=true;
+          fill(255-min(255, colourSection));
+          stroke(255-min(255, colourSection));
+          rect(305+50*j, 250, 40, 90);
+          fill(min(255, colourSection));
+          stroke(min(255, colourSection));
+          colourSection+=10;
+        } else {
+          fill(255);
+          rect(305+50*j, 250, 40, 90);
+          fill(0);
+        }
+        for (int i=0; i<3; i++) {
+          text((i+curValue[j])%10, 320+50*j, 300+30*(i-1));
+        }
+        numComb*=10;
+        numComb+=(1+curValue[j])%10;
+      }
+      if (!isInOneSection)colourSection=0;
+      if (lockPassKey[squareX][squareY]==numComb)hasUnlocked=true;
+      if (keyPressed&&key!=' ')hasMenuOpen=false;
+    }
+  } else if (playerMap[squareX][squareY]==3) {
+    if (keyPressed&&key==' ')playerMap[squareX][squareY]=itemMap[squareX][squareY];
+  } else if (playerMap[squareX][squareY]==5) {
+    if (keyPressed&&key==' ') {
+    }
+  }
+}
+void setupRoomOne() {
+  //0 floor
+  //1 wall
+  //2 locked box
+  //3 unlocked box
+  //4 note
+  //itemMap
+  //lockPassKey
+  //noteMap
+  //playerMap
+  for(int i=0; i<7; i++)playerMap[7][i]=1;
+  for(int i=0; i<8; i++)playerMap[i][6]=1;
+  playerMap[5][1]=4;
+  noteMap[5][1]="Hello Subject 1342,\n"
+                +"Welcome to my escape room! A\n"
+                +"game where you are stuck in a room\n"
+                +"and you have to solve puzzles\n"
+                +"to escape and move on to the next.\n"
+                +"Let\'s move shall we? To escape your\n"
+                +"first room, you need to forget who\n"
+                +"you were and focus on who you are.\n"
+                +"            Now...";
+  playerMap[3][6]=2;
+  lockPassKey[3][6]=1342;
+  itemMap[3][6]=0;
+}
+void resetRoom() {
+  hasControl=true;
+  characterX=32*5;
+  characterY=32*5;
+  lastMove='d';
+  colourSection=0;
+  shackleY=0;
+  numComb=0;
+  hasMenuOpen=false;
+  for (int i=0; i<4; i++) {
+    finalValue[i]=0;
+    curValue[i]=0;
+    scrollX[i]=0;
+    distance[i]=0;
+    playerBar[i]=0;
+  }
+  for (int i=0; i<25; i++) {
+    for (int j=0; j<13; j++) {
+      playerMap[i][j]=0;
+      noteMap[i][j]="";
+      lockPassKey[i][j]=0;
+      itemMap[i][j]=0;
+    }
+  }
 }
 void playGame() {
   if (hasWentToCharacter) {
@@ -122,114 +318,135 @@ void playGame() {
     //Warning screen
   }
 }
-void drawPlayerMap() {
+void drawMap() {
+  background(100);
+  for (int i=0; i<5; i++) {
+    stroke(0);
+    fill(255);
+    rect(20+80*i, 425, 60, 60);
+  }
   for (int i=0; i<25; i++) {
     for (int j=0; j<13; j++) {
-      if (playerMap[i][j]==0) {
+      if (playerMap[i][j]!=1) {
         if ((i+j)%2==0) {
-          stroke(100, 200, 100);
-          fill(100, 200, 100);
+          stroke(#000080);
+          fill(#000080);
+          rect(32*i, 32*j, 31, 31);
         } else {
-          stroke(100, 100, 200);
-          fill(100, 100, 200);
+          stroke(#add8e6);
+          fill(#add8e6);
+          rect(32*i, 32*j, 31, 31);
         }
-      } else if (playerMap[i][j]==1) {
+      }
+      if (playerMap[i][j]==1) {
         stroke(200);
         fill(200);
+        rect(32*i, 32*j, 31, 31);
+      } else if (playerMap[i][j]==2) {
+        image(lockedBox, 32*i, 32*j);
+      } else if (playerMap[i][j]==3) {
+        image(unlockedBox, 32*i, 32*j);
+      } else if (playerMap[i][j]==4) {
+        image(note, 32*i, 32*j);
       }
-      rect(32*i, 32*j, 31, 31);
     }
   }
 }
 void moveCharacter() {
+
   if (hasControl) {
     if (lastMove=='w') characterBackIdle();
     if (lastMove=='a') characterLeftIdle();
     if (lastMove=='s') characterFwdIdle();
     if (lastMove=='d') characterRightIdle();
-    if (keyPressed) {
-      if (key=='w') {
-        lastMove='w';
-        hasControl=false;
+    if (!hasMenuOpen) {
+      if (keyPressed) {
+        if (key=='w'||(key==CODED&&keyCode==UP)) {
+          lastMove='w';
+          hasControl=false;
+        }
+        if (key=='a'||(key==CODED&&keyCode==LEFT)) {
+          lastMove='a';
+          hasControl=false;
+        }
+        if (key=='s'||(key==CODED&&keyCode==DOWN)) {
+          lastMove='s';
+          hasControl=false;
+        }
+        if (key=='d'||(key==CODED&&keyCode==RIGHT)) {
+          lastMove='d';
+          hasControl=false;
+        }
       }
-      if (key=='a') {
-        lastMove='a';
-        hasControl=false;
-      }
-      if (key=='s') {
-        lastMove='s';
-        hasControl=false;
-      }
-      if (key=='d') {
-        lastMove='d';
-        hasControl=false;
-      }
+      characterGridX=characterX/32;
+      characterGridY=characterY/32;
+      moveCharacterMoves=0;
+      moveCharacterFrame=0;
     }
-    characterGridX=characterX/32;
-    characterGridY=characterY/32;
-    moveCharacterMoves=0;
-    moveCharacterFrame=0;
   } else {
-    if (lastMove=='w') {
-      if (moveCharacterFrame++==0) {
-        moveCharacterMoves++;
-        characterY-=2;
-      }
-      if (moveCharacterMoves%2==0) characterBackOne();
-      else characterBackTwo();
-      if (playerMap[characterGridX][characterGridY-1]!=0) {
+    if (!hasMenuOpen) {
+      if (lastMove=='w') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterY-=2;
+        }
+        if (moveCharacterMoves%2==0) characterBackOne();
+        else characterBackTwo();
+        if (playerMap[characterGridX][characterGridY-1]!=0) {
 
-        if (moveCharacterMoves>4) {
-          characterY+=10;
-          hasControl=true;
+          if (moveCharacterMoves>4) {
+            characterY+=10;
+            hasControl=true;
+          }
         }
       }
-    }
-    if (lastMove=='a') {
-      if (moveCharacterFrame++==0) {
-        moveCharacterMoves++;
-        characterX-=2;
-      }
-      if (moveCharacterMoves%2==0) characterLeftOne();
-      else characterLeftTwo();
-      if (playerMap[characterGridX-1][characterGridY]!=0) {
+      if (lastMove=='a') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterX-=2;
+        }
+        if (moveCharacterMoves%2==0) characterLeftOne();
+        else characterLeftTwo();
+        if (playerMap[characterGridX-1][characterGridY]!=0) {
 
-        if (moveCharacterMoves>4) {
-          characterX+=10;
-          hasControl=true;
+          if (moveCharacterMoves>4) {
+            characterX+=10;
+            hasControl=true;
+          }
         }
       }
-    }
-    if (lastMove=='s') {
-      if (moveCharacterFrame++==0) {
-        moveCharacterMoves++;
-        characterY+=2;
-      }
-      if (moveCharacterMoves%2==0) characterFwdOne();
-      else characterFwdTwo();
-      if (playerMap[characterGridX][characterGridY+1]!=0) {
-        if (moveCharacterMoves>4) {
-          characterY-=10;
-          hasControl=true;
+      if (lastMove=='s') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterY+=2;
+        }
+        if (moveCharacterMoves%2==0) characterFwdOne();
+        else characterFwdTwo();
+        if (playerMap[characterGridX][characterGridY+1]!=0) {
+          if (moveCharacterMoves>4) {
+            characterY-=10;
+            hasControl=true;
+          }
         }
       }
-    }
-    if (lastMove=='d') {
-      if (moveCharacterFrame++==0) {
-        moveCharacterMoves++;
-        characterX+=2;
-      }
-      if (moveCharacterMoves%2==0) characterRightOne();
-      else characterRightTwo();
-      if (playerMap[characterGridX+1][characterGridY]!=0) {
-        if (moveCharacterMoves>4) {
-          characterX-=10;
-          hasControl=true;
+      if (lastMove=='d') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterX+=2;
+        }
+        if (moveCharacterMoves%2==0) characterRightOne();
+        else characterRightTwo();
+        if (playerMap[characterGridX+1][characterGridY]!=0) {
+          if (moveCharacterMoves>4) {
+            characterX-=10;
+            hasControl=true;
+          }
         }
       }
+      moveCharacterFrame%=1;//This will be the FPS of the character
+      if (moveCharacterMoves==16)hasControl=true;
     }
-    moveCharacterFrame%=3;//This will be the FPS of the character
-    if (moveCharacterMoves==16)hasControl=true;
+    //println(characterGridX+" "+characterGridY);
   }
 }
 void drawColourSquare() {
@@ -256,10 +473,6 @@ void colourPicker() {
       point(i+colourSquareX, 255+colourSquareY-j);
     }
   }
-  stroke(100, 100, 200);
-  fill(100, 100, 200);
-  rect(450, 90, 200, 50);
-  rect(450, 15, 200, 50);
   if (mousePressed) {
     if (mouseX<=650&&mouseX>=450&&mouseY<=65&&mouseY>=15) {
       h=(int)hue(characterHairOne);
@@ -290,20 +503,26 @@ void colourPicker() {
     characterHairOne=color(h, s, b);
     characterHairTwo=color(h, s, b*.9);
     stroke(255);
-    fill(150, 255, 255);
-    rect(450, 15, 200, 50);//TODO change it to a more appeasing colour
+    fill(200);
+    rect(450, 90, 200, 50);
+    stroke(150, 100, 200);
+    fill(150, 100, 200);
+    rect(450, 15, 200, 50);
   } else {
     characterPantsOne=color(h, s, b);
     characterPantsTwo=color(h, s, b*.65);
     characterPantsThree=color(h, s, b*.6);
     stroke(255);
-    fill(150, 255, 255);
+    fill(200);
+    rect(450, 15, 200, 50);//TODO change it to a more appeasing colour
+    stroke(150, 100, 200);
+    fill(150, 100, 200);
     rect(450, 90, 200, 50);
   }
   fill(200, 100, 100);
   textSize(48);
-  text("Hair", 450, 65);
-  text("Pants", 450, 140);
+  text("Hair", 495, 58);
+  text("Pants", 480, 130);
   colorMode(RGB);
   colourPickerSample();
 
