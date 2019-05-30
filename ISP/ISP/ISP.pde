@@ -1,4 +1,4 @@
-int currentWindow=0;
+int currentWindow=1;
 int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
@@ -23,7 +23,7 @@ int moveCharacterFrame=0;
 int moveCharacterMoves=0;
 int characterGridX=0;
 int characterGridY=0;
-PImage lockedBox, unlockedBox, note, paperNote;
+PImage lockedBox, unlockedBox, note, paperNote, lockedWall;
 String noteMap[][]=new String[25][13];
 int lockPassKey[][]=new int[25][13];
 int finalValue[]=new int[4];
@@ -39,6 +39,8 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
+//Room One
+PImage roomOneGrid;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -54,6 +56,11 @@ void setup() {
   smooth();
   foreGround=createGraphics(800, 500);
   bg = loadImage("splashScreenBG.jpg");
+  lockedBox=loadImage("LockedBox.png");
+  unlockedBox=loadImage("UnlockedBox.png");
+  note = loadImage("Note.png");
+  paperNote=loadImage("NotePopup.png");
+  lockedWall=loadImage("LockedEntry.png");
 }
 void draw() {
   if (currentWindow==0) {
@@ -86,10 +93,6 @@ void draw() {
     playGame();
     if (currentWindow==7) {
       background(100);
-      lockedBox=loadImage("LockedBox.png");
-      unlockedBox=loadImage("UnlockedBox.png");
-      note = loadImage("Note.png");
-      paperNote=loadImage("NotePopup.png");
       characterX=32;
       characterY=32;
       setupRoomOne();
@@ -110,6 +113,7 @@ void roomOne() {  //This will most likely have to change
   drawMap();
   moveCharacter();
   guiPopup();
+  drawRoomOne();
 }
 void guiPopup() {
   int squareX=characterX/32;
@@ -141,7 +145,7 @@ void guiPopup() {
       text(noteMessage+"_", 150, 100);
       if (mousePressed||(keyPressed&&key!=' '))hasMenuOpen=false;
     }
-  } else if (playerMap[squareX][squareY]==2) {
+  } else if (playerMap[squareX][squareY]==2||playerMap[squareX][squareY]==5) {  //Maybe switch 5 to its own if
     if (keyPressed&&key==' '&&!hasMenuOpen) {
       hasMenuOpen=true;
       for (int i=0; i<4; i++) {
@@ -156,6 +160,14 @@ void guiPopup() {
       hasUnlocked=false;
     }
     if (hasMenuOpen) {
+
+      strokeWeight(10);
+      fill(240);
+      stroke(0);
+      rect(96, 32, 608, 384);
+      fill(100);
+      textSize(30);
+      text("Press\nany\nkey\nto\ncontinue", 125, 200);
       textSize(20);
       strokeWeight(28);
       noFill();
@@ -216,6 +228,7 @@ void guiPopup() {
           colourSection+=10;
         } else {
           fill(255);
+          stroke(255);
           rect(305+50*j, 250, 40, 90);
           fill(0);
         }
@@ -230,9 +243,32 @@ void guiPopup() {
       if (keyPressed&&key!=' ')hasMenuOpen=false;
     }
   } else if (playerMap[squareX][squareY]==3) {
-    if (keyPressed&&key==' ')playerMap[squareX][squareY]=itemMap[squareX][squareY];
+    if (keyPressed&&key==' ') {
+      if (itemMap[squareX][squareY]!=3)
+        playerMap[squareX][squareY]=itemMap[squareX][squareY];
+    } else {
+      playerMap[squareX][squareY]=0;
+    }
   } else if (playerMap[squareX][squareY]==5) {
     if (keyPressed&&key==' ') {
+    }
+  }
+}
+void drawRoomOne(){
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  if (lastMove=='w')squareY--;
+  else if (lastMove=='a')squareX--;
+  else if (lastMove=='s')squareY++;
+  else if (lastMove=='d')squareX++;
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==4) {
+    if (keyPressed&&key==' '&&!hasMenuOpen) {
+      
+    }
+    if (hasMenuOpen) {
+      
     }
   }
 }
@@ -242,25 +278,29 @@ void setupRoomOne() {
   //2 locked box
   //3 unlocked box
   //4 note
+  //5 locked wall
   //itemMap
   //lockPassKey
   //noteMap
   //playerMap
-  for(int i=0; i<7; i++)playerMap[7][i]=1;
-  for(int i=0; i<8; i++)playerMap[i][6]=1;
+  for (int i=0; i<7; i++)playerMap[7][i]=1;
+  for (int i=0; i<8; i++)playerMap[i][6]=1;
   playerMap[5][1]=4;
   noteMap[5][1]="Hello Subject 1342,\n"
-                +"Welcome to my escape room! A\n"
-                +"game where you are stuck in a room\n"
-                +"and you have to solve puzzles\n"
-                +"to escape and move on to the next.\n"
-                +"Let\'s move shall we? To escape your\n"
-                +"first room, you need to forget who\n"
-                +"you were and focus on who you are.\n"
-                +"            Now...";
-  playerMap[3][6]=2;
+    +"Welcome to my escape room! A\n"
+    +"game where you are stuck in a room\n"
+    +"and you have to solve puzzles\n"
+    +"to escape and move on to the next.\n"
+    +"To escape your first room, you\n"
+    +"need to forget who you were and\n"
+    +"focus on who you are now.\n";
+  //playerMap[3][6]=5;
+  playerMap[3][6]=0;  //To remove this once finished
   lockPassKey[3][6]=1342;
   itemMap[3][6]=0;
+  for (int i=0; i<13; i++)playerMap[13][i]=1;
+  playerMap[3][9]=4;
+  noteMap[3][9]="Great job my subject, ";
 }
 void resetRoom() {
   hasControl=true;
@@ -348,6 +388,8 @@ void drawMap() {
         image(unlockedBox, 32*i, 32*j);
       } else if (playerMap[i][j]==4) {
         image(note, 32*i, 32*j);
+      } else if (playerMap[i][j]==5) {
+        image(lockedWall, 32*i, 32*j);
       }
     }
   }
