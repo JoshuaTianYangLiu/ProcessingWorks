@@ -40,7 +40,8 @@ boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
 //Room One
-PImage roomOneGrid;
+PImage roomOneGrid,roomOneGridPuzzle;
+boolean rOHasMenuOpen=false;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -61,6 +62,9 @@ void setup() {
   note = loadImage("Note.png");
   paperNote=loadImage("NotePopup.png");
   lockedWall=loadImage("LockedEntry.png");
+
+  roomOneGrid=loadImage("RoomOnePuzzleGrid.png");
+  roomOneGridPuzzle=loadImage("RoomOnePuzzleGridPuzzle.png");
 }
 void draw() {
   if (currentWindow==0) {
@@ -254,7 +258,7 @@ void guiPopup() {
     }
   }
 }
-void drawRoomOne(){
+void drawRoomOne() {
   int squareX=characterX/32;
   int squareY=characterY/32;
   if (lastMove=='w')squareY--;
@@ -264,11 +268,20 @@ void drawRoomOne(){
   squareX=max(0, squareX);
   squareY=max(0, squareY);
   if (playerMap[squareX][squareY]==4) {
-    if (keyPressed&&key==' '&&!hasMenuOpen) {
-      
-    }
-    if (hasMenuOpen) {
-      
+    if (squareX==3&&squareY==9) {
+      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
+        rOHasMenuOpen=true;
+      }else if (rOHasMenuOpen) {
+        image(roomOneGrid,0,0);
+        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
+      }
+    }else if(squareX==6&&squareY==9){
+      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
+        rOHasMenuOpen=true;
+      }else if (rOHasMenuOpen) {
+        image(roomOneGridPuzzle,0,0);
+        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
+      }
     }
   }
 }
@@ -284,7 +297,7 @@ void setupRoomOne() {
   //noteMap
   //playerMap
   for (int i=0; i<7; i++)playerMap[7][i]=1;
-  for (int i=0; i<8; i++)playerMap[i][6]=1;
+  for (int i=0; i<14; i++)playerMap[i][6]=1;
   playerMap[5][1]=4;
   noteMap[5][1]="Hello Subject 1342,\n"
     +"Welcome to my escape room! A\n"
@@ -300,7 +313,16 @@ void setupRoomOne() {
   itemMap[3][6]=0;
   for (int i=0; i<13; i++)playerMap[13][i]=1;
   playerMap[3][9]=4;
-  noteMap[3][9]="Great job my subject, ";
+  noteMap[3][9]="";
+  playerMap[6][9]=4;
+  noteMap[6][9]="\n\n\n\n\n\n\nHint: T is the first letter.";
+  playerMap[10][9]=2;
+  itemMap[10][9]=4;
+  lockPassKey[10][9]=3740;
+  noteMap[10][9]="Good job my subject, here\'s your\n"
+                +"next puzzle.";
+  playerMap[10][6]=5;
+  lockPassKey[10][6]=2111;
 }
 void resetRoom() {
   hasControl=true;
@@ -360,11 +382,6 @@ void playGame() {
 }
 void drawMap() {
   background(100);
-  for (int i=0; i<5; i++) {
-    stroke(0);
-    fill(255);
-    rect(20+80*i, 425, 60, 60);
-  }
   for (int i=0; i<25; i++) {
     for (int j=0; j<13; j++) {
       if (playerMap[i][j]!=1) {
@@ -486,7 +503,9 @@ void moveCharacter() {
         }
       }
       moveCharacterFrame%=1;//This will be the FPS of the character
-      if (moveCharacterMoves==16)hasControl=true;
+      if (moveCharacterMoves==16){
+        hasControl=true;
+      }
     }
     //println(characterGridX+" "+characterGridY);
   }
@@ -5992,7 +6011,7 @@ void characterBackOne() {
   fill(characterHairTwo);
   point(18+characterX, 13+characterY);
   stroke(characterHairTwo);
-  fill(characterHairTwo);
+  fill(characterHairTwo); 
   point(18+characterX, 14+characterY);
   stroke(characterHairTwo);
   fill(characterHairTwo);
