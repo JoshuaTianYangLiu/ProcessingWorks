@@ -1,4 +1,4 @@
-int currentWindow=0;
+int currentWindow=1;
 int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
@@ -23,7 +23,7 @@ int moveCharacterFrame=0;
 int moveCharacterMoves=0;
 int characterGridX=0;
 int characterGridY=0;
-PImage lockedBox, unlockedBox, note, paperNote, lockedWall;
+PImage lockedBox, unlockedBox, note, paperNote, lockedWall, iceFloor;
 String noteMap[][]=new String[25][13];
 int lockPassKey[][]=new int[25][13];
 int finalValue[]=new int[4];
@@ -40,7 +40,7 @@ boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
 int onLevel=7;
-int startSec,startMin,startHr;
+int startSec, startMin, startHr;
 
 //Room One
 PImage roomOneGrid, roomOneGridPuzzle;
@@ -65,6 +65,7 @@ void setup() {
   note = loadImage("Note.png");
   paperNote=loadImage("NotePopup.png");
   lockedWall=loadImage("LockedEntry.png");
+  iceFloor=loadImage("IceFloor.png");
 
   roomOneGrid=loadImage("RoomOnePuzzleGrid.png");
   roomOneGridPuzzle=loadImage("RoomOnePuzzleGridPuzzle.png");
@@ -123,24 +124,24 @@ void roomOne() {  //This will most likely have to change
   guiPopup();
   drawRoomOne();
 }
-void timeElasped(){
+void timeElasped() {
   int secondElasped=second()-startSec;
   int minuteElasped=minute()-startMin;
   int hourElasped=hour()-startHr;
-  if(secondElasped<0){
+  if (secondElasped<0) {
     secondElasped+=60;
     minuteElasped--;
   }
-  if(minuteElasped<0){
+  if (minuteElasped<0) {
     minuteElasped+=60;
     hourElasped--;
   }
   String outputLine="";
-  if(hourElasped<10)outputLine+="0"+hourElasped+":";
+  if (hourElasped<10)outputLine+="0"+hourElasped+":";
   else outputLine+=hourElasped+":";
-  if(minuteElasped<10)outputLine+="0"+minuteElasped+":";
+  if (minuteElasped<10)outputLine+="0"+minuteElasped+":";
   else outputLine+=minuteElasped+":";
-  if(secondElasped<10)outputLine+="0"+secondElasped;
+  if (secondElasped<10)outputLine+="0"+secondElasped;
   else outputLine+=secondElasped;
   text("Time "+outputLine, 20, 470);
 }
@@ -153,7 +154,7 @@ void guiPopup() {
   else if (lastMove=='d')squareX++;
   squareX=max(0, squareX);
   squareY=max(0, squareY);
-  println(squareX+" "+squareY);
+  println(playerMap[squareX][squareY],squareX,squareY);
   if (playerMap[squareX][squareY]==4) {
     if (keyPressed&&key==' '&&!hasMenuOpen) {
       hasMenuOpen=true;
@@ -317,10 +318,14 @@ void setupRoomOne() {
   //3 unlocked box
   //4 note
   //5 locked wall
+  //6 ice floor
   //itemMap
   //lockPassKey
   //noteMap
   //playerMap
+  for (int i=8; i<24; i++) {
+    for (int j=1; j<6; j++)playerMap[i][j]=6;
+  }
   for (int i=0; i<7; i++)playerMap[7][i]=1;
   for (int i=0; i<14; i++)playerMap[i][6]=1;
   playerMap[5][1]=4;
@@ -428,7 +433,7 @@ void drawMap() {
           rect(32*i, 32*j, 31, 31);
         }
       }
-      if (playerMap[i][j]==1) {
+      if (playerMap[i][j]==1||playerMap[i][j]==6) {
         stroke(200);
         fill(200);
         rect(32*i, 32*j, 31, 31);
@@ -440,6 +445,9 @@ void drawMap() {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
         image(lockedWall, 32*i, 32*j);
+      }
+      if (playerMap[i][j]==6) {
+        image(iceFloor, 32*i, 32*j);
       }
     }
   }
@@ -511,7 +519,7 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterBackOne();
         else characterBackTwo();
-        if (playerMap[characterGridX][characterGridY-1]!=0) {
+        if (playerMap[characterGridX][characterGridY-1]!=0&&playerMap[characterGridX][characterGridY-1]!=6) {
 
           if (moveCharacterMoves>4) {
             characterY+=10;
@@ -526,7 +534,7 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterLeftOne();
         else characterLeftTwo();
-        if (playerMap[characterGridX-1][characterGridY]!=0) {
+        if (playerMap[characterGridX-1][characterGridY]!=0&&playerMap[characterGridX-1][characterGridY]!=6) {
 
           if (moveCharacterMoves>4) {
             characterX+=10;
@@ -541,7 +549,7 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterFwdOne();
         else characterFwdTwo();
-        if (playerMap[characterGridX][characterGridY+1]!=0) {
+        if (playerMap[characterGridX][characterGridY+1]!=0&&playerMap[characterGridX][characterGridY+1]!=6) {
           if (moveCharacterMoves>4) {
             characterY-=10;
             hasControl=true;
@@ -555,7 +563,7 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterRightOne();
         else characterRightTwo();
-        if (playerMap[characterGridX+1][characterGridY]!=0) {
+        if (playerMap[characterGridX+1][characterGridY]!=0&&playerMap[characterGridX+1][characterGridY]!=6) {
           if (moveCharacterMoves>4) {
             characterX-=10;
             hasControl=true;
@@ -564,7 +572,12 @@ void moveCharacter() {
       }
       moveCharacterFrame%=1;//This will be the FPS of the character
       if (moveCharacterMoves==16) {
+        if(playerMap[characterGridX][characterGridY]==0)
         hasControl=true;
+        moveCharacterMoves=0;
+        moveCharacterFrame=0;
+        characterGridX=characterX/32;
+      characterGridY=characterY/32;
       }
     }
     //println(characterGridX+" "+characterGridY);
