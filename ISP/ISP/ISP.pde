@@ -1,4 +1,4 @@
-int currentWindow=1;
+int currentWindow=0;
 int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
@@ -39,8 +39,11 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
+int onLevel=7;
+int startSec,startMin,startHr;
+
 //Room One
-PImage roomOneGrid,roomOneGridPuzzle;
+PImage roomOneGrid, roomOneGridPuzzle;
 boolean rOHasMenuOpen=false;
 //0 is splash screen
 //1 is main menu
@@ -77,10 +80,6 @@ void draw() {
     if (currentWindow==2) {
       strokeWeight(1);
       size(800, 500);
-      for (int i=0; i<25; i++)playerMap[i][0]=1;
-      for (int i=0; i<25; i++)playerMap[i][12]=1;
-      for (int i=0; i<13; i++)playerMap[0][i]=1;
-      for (int i=0; i<13; i++)playerMap[24][i]=1;
     } else if (currentWindow==3) {
     } else if (currentWindow==4) {
       strokeWeight(1);
@@ -96,10 +95,14 @@ void draw() {
   } else if (currentWindow==2) {
     playGame();
     if (currentWindow==7) {
+      resetRoom();
       background(100);
       characterX=32;
       characterY=32;
       setupRoomOne();
+      startSec=second();
+      startMin=minute();
+      startHr=hour();
     }
     //Most likely this will switch to multiple methods needing multiple values for each room
   } else if (currentWindow==3) {
@@ -115,9 +118,31 @@ void draw() {
 }
 void roomOne() {  //This will most likely have to change
   drawMap();
+  timeElasped();
   moveCharacter();
   guiPopup();
   drawRoomOne();
+}
+void timeElasped(){
+  int secondElasped=second()-startSec;
+  int minuteElasped=minute()-startMin;
+  int hourElasped=hour()-startHr;
+  if(secondElasped<0){
+    secondElasped+=60;
+    minuteElasped--;
+  }
+  if(minuteElasped<0){
+    minuteElasped+=60;
+    hourElasped--;
+  }
+  String outputLine="";
+  if(hourElasped<10)outputLine+="0"+hourElasped+":";
+  else outputLine+=hourElasped+":";
+  if(minuteElasped<10)outputLine+="0"+minuteElasped+":";
+  else outputLine+=minuteElasped+":";
+  if(secondElasped<10)outputLine+="0"+secondElasped;
+  else outputLine+=secondElasped;
+  text("Time "+outputLine, 20, 470);
 }
 void guiPopup() {
   int squareX=characterX/32;
@@ -271,15 +296,15 @@ void drawRoomOne() {
     if (squareX==3&&squareY==9) {
       if (keyPressed&&key==' '&&!rOHasMenuOpen) {
         rOHasMenuOpen=true;
-      }else if (rOHasMenuOpen) {
-        image(roomOneGrid,0,0);
+      } else if (rOHasMenuOpen) {
+        image(roomOneGrid, 0, 0);
         if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
       }
-    }else if(squareX==6&&squareY==9){
+    } else if (squareX==6&&squareY==9) {
       if (keyPressed&&key==' '&&!rOHasMenuOpen) {
         rOHasMenuOpen=true;
-      }else if (rOHasMenuOpen) {
-        image(roomOneGridPuzzle,0,0);
+      } else if (rOHasMenuOpen) {
+        image(roomOneGridPuzzle, 0, 0);
         if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
       }
     }
@@ -320,7 +345,7 @@ void setupRoomOne() {
   itemMap[10][9]=4;
   lockPassKey[10][9]=3740;
   noteMap[10][9]="Good job my subject, here\'s your\n"
-                +"next puzzle.";
+    +"next puzzle.";
   playerMap[10][6]=5;
   lockPassKey[10][6]=2111;
 }
@@ -348,6 +373,10 @@ void resetRoom() {
       itemMap[i][j]=0;
     }
   }
+  for (int i=0; i<25; i++)playerMap[i][0]=1;
+  for (int i=0; i<25; i++)playerMap[i][12]=1;
+  for (int i=0; i<13; i++)playerMap[0][i]=1;
+  for (int i=0; i<13; i++)playerMap[24][i]=1;
 }
 void playGame() {
   if (hasWentToCharacter) {
@@ -372,9 +401,13 @@ void playGame() {
       stroke(200, 200, 255);
       fill(200, 200, 255);
       rect(550, 200, 200, 100);
-      if (mousePressed)currentWindow=7;//Room one
+      if (mousePressed) {
+        currentWindow=onLevel;//Room one
+        hasWentToCharacter=true;
+      }
     }
     fill(0);
+    textSize(30);
     text("No, take me\nback", 320, 240);
     text("Yes, let's\ncontinue", 575, 240);
     //Warning screen
@@ -410,6 +443,33 @@ void drawMap() {
       }
     }
   }
+  fill(100, 100, 200);
+  stroke(100, 100, 200);
+  if (mouseX>=340&&mouseX<=500&&mouseY>=430&&mouseY<=480) {
+    fill(150, 150, 250);
+    stroke(150, 150, 250);
+    if (mousePressed) {
+      currentWindow=2;
+      delay(100);
+    }
+  } else {
+    fill(100, 100, 200);
+    stroke(100, 100, 200);
+  }
+  rect(340, 430, 160, 50);
+  if (mouseX>=540&&mouseX<=770&&mouseY>=430&&mouseY<=480) {
+    fill(150, 150, 250);
+    stroke(150, 150, 250);
+    if (mousePressed)currentWindow=1;
+  } else {
+    fill(100, 100, 200);
+    stroke(100, 100, 200);
+  }
+  rect(540, 430, 230, 50);
+  fill(255);
+  textSize(40);
+  text("Restart", 350, 470);
+  text("Main Menu", 550, 470);
 }
 void moveCharacter() {
 
@@ -503,7 +563,7 @@ void moveCharacter() {
         }
       }
       moveCharacterFrame%=1;//This will be the FPS of the character
-      if (moveCharacterMoves==16){
+      if (moveCharacterMoves==16) {
         hasControl=true;
       }
     }
