@@ -114,10 +114,12 @@ void draw() {
   } else if (currentWindow==5) {
   } else if (currentWindow==6) {
   } else if (currentWindow==7) {
+    background(100, 200, 100);
   } else if (currentWindow==8) {
     roomOne();
     //Room One
   }
+  println(mouseX/32, mouseY/32);
 }
 void roomOne() {  //This will most likely have to change
   drawMap();
@@ -126,6 +128,91 @@ void roomOne() {  //This will most likely have to change
   guiPopup();
   drawRoomOne();
   winPlatform();
+}
+void drawRoomOne() {
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  //println(squareX,squareY);
+  if (lastMove=='w')squareY--;
+  else if (lastMove=='a')squareX--;
+  else if (lastMove=='s')squareY++;
+  else if (lastMove=='d')squareX++;
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==4) {
+    if (squareX==3&&squareY==9) {
+      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
+        rOHasMenuOpen=true;
+      } else if (rOHasMenuOpen) {
+        image(roomOneGrid, 0, 0);
+        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
+      }
+    } else if (squareX==6&&squareY==9) {
+      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
+        rOHasMenuOpen=true;
+      } else if (rOHasMenuOpen) {
+        image(roomOneGridPuzzle, 0, 0);
+        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
+      }
+    }
+  }
+}
+void setupRoomOne() {
+  //0 floor
+  //1 wall
+  //2 locked box
+  //3 unlocked box
+  //4 note
+  //5 locked wall
+  //6 ice floor
+  //7 win platform
+  //itemMap
+  //lockPassKey
+  //noteMap
+  //playerMap
+  for (int i=8; i<24; i++) {
+    for (int j=1; j<6; j++)playerMap[i][j]=6;
+  }
+  for (int i=14; i<24; i++) {
+    for (int j=6; j<12; j++)playerMap[i][j]=6;
+  }
+  for (int i=0; i<7; i++)playerMap[7][i]=1;
+  for (int i=0; i<14; i++)playerMap[i][6]=1;
+  playerMap[5][1]=4;
+  noteMap[5][1]="Hello Subject 1342,\n"
+    +"Welcome to my escape room! A\n"
+    +"game where you are stuck in a room\n"
+    +"and you have to solve puzzles\n"
+    +"to escape and move on to the next.\n"
+    +"To escape your first room, you\n"
+    +"need to forget who you were and\n"
+    +"focus on who you are now.\n";
+  //playerMap[3][6]=5;
+  playerMap[3][6]=0;  //To remove this once finished
+  lockPassKey[3][6]=1342;
+  itemMap[3][6]=0;
+  for (int i=0; i<13; i++)playerMap[13][i]=1;
+  playerMap[3][9]=4;
+  noteMap[3][9]="";
+  playerMap[6][9]=4;
+  noteMap[6][9]="\n\n\n\n\n\n\nHint: T is the first letter.";
+  playerMap[10][9]=2;
+  itemMap[10][9]=4;
+  lockPassKey[10][9]=3740;
+  noteMap[10][9]="Good job my subject, here\'s your\n"
+    +"next puzzle.\n"
+    +"Answer is 2019";
+  playerMap[10][6]=5;
+  playerMap[10][6]=0;
+  lockPassKey[10][6]=2019;
+  playerMap[10][4]=1;
+  playerMap[11][2]=1;
+  playerMap[8][3]=4;
+  noteMap[8][3]="This will be the last message\n"
+    +"you\'ll be hearing from me.\n"
+    +"See you at the end!";
+  playerMap[3][2]=7;
+  playerMap[13][3]=6;
 }
 void winPlatform() {
   int squareX=characterX/32;
@@ -298,86 +385,6 @@ void guiPopup() {
     }
   }
 }
-void drawRoomOne() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  //println(squareX,squareY);
-  if (lastMove=='w')squareY--;
-  else if (lastMove=='a')squareX--;
-  else if (lastMove=='s')squareY++;
-  else if (lastMove=='d')squareX++;
-  squareX=max(0, squareX);
-  squareY=max(0, squareY);
-  if (playerMap[squareX][squareY]==4) {
-    if (squareX==3&&squareY==9) {
-      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
-        rOHasMenuOpen=true;
-      } else if (rOHasMenuOpen) {
-        image(roomOneGrid, 0, 0);
-        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
-      }
-    } else if (squareX==6&&squareY==9) {
-      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
-        rOHasMenuOpen=true;
-      } else if (rOHasMenuOpen) {
-        image(roomOneGridPuzzle, 0, 0);
-        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
-      }
-    }
-  }
-}
-void setupRoomOne() {
-  //0 floor
-  //1 wall
-  //2 locked box
-  //3 unlocked box
-  //4 note
-  //5 locked wall
-  //6 ice floor
-  //7 win platform
-  //itemMap
-  //lockPassKey
-  //noteMap
-  //playerMap
-  for (int i=8; i<24; i++) {
-    for (int j=1; j<6; j++)playerMap[i][j]=6;
-  }
-  for (int i=0; i<7; i++)playerMap[7][i]=1;
-  for (int i=0; i<14; i++)playerMap[i][6]=1;
-  playerMap[5][1]=4;
-  noteMap[5][1]="Hello Subject 1342,\n"
-    +"Welcome to my escape room! A\n"
-    +"game where you are stuck in a room\n"
-    +"and you have to solve puzzles\n"
-    +"to escape and move on to the next.\n"
-    +"To escape your first room, you\n"
-    +"need to forget who you were and\n"
-    +"focus on who you are now.\n";
-  //playerMap[3][6]=5;
-  playerMap[3][6]=0;  //To remove this once finished
-  lockPassKey[3][6]=1342;
-  itemMap[3][6]=0;
-  for (int i=0; i<13; i++)playerMap[13][i]=1;
-  playerMap[3][9]=4;
-  noteMap[3][9]="";
-  playerMap[6][9]=4;
-  noteMap[6][9]="\n\n\n\n\n\n\nHint: T is the first letter.";
-  playerMap[10][9]=2;
-  itemMap[10][9]=4;
-  lockPassKey[10][9]=3740;
-  noteMap[10][9]="Good job my subject, here\'s your\n"
-    +"next puzzle.";
-  playerMap[10][6]=5;
-  lockPassKey[10][6]=2111;
-  playerMap[10][4]=1;
-  playerMap[11][2]=1;
-  playerMap[8][3]=4;
-  noteMap[8][3]="This will be the last message\n"
-    +"you\'ll be hearing from me.\n"
-    +"See you at the end!";
-  playerMap[13][3]=0;
-  playerMap[3][2]=7;
-}
 void resetRoom() {
   hasControl=true;
   characterX=32*5;
@@ -469,9 +476,9 @@ void drawMap() {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
         image(lockedWall, 32*i, 32*j);
-      }else if(playerMap[i][j]==7){
-        stroke(100,200,100);
-        fill(100,200,100);
+      } else if (playerMap[i][j]==7) {
+        stroke(100, 200, 100);
+        fill(100, 200, 100);
         rect(32*i, 32*j, 31, 31);
       }
       if (playerMap[i][j]==6) {
@@ -616,7 +623,6 @@ void moveCharacter() {
         moveCharacterMoves=0;
         moveCharacterFrame=0;
       }
-      println(playerMap[characterGridX][characterGridY], characterGridX, characterGridY, moveCharacterMoves);
     }
   }
 }
