@@ -39,7 +39,7 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
-int onLevel=7;
+int onLevel=8;
 int startSec, startMin, startHr;
 
 //Room One
@@ -52,8 +52,9 @@ boolean rOHasMenuOpen=false;
 //4 is character
 //5 is instructions
 //6 is quit
-//7 is roomOne
-//8 is roomTwo
+//7 is win screen
+//8 is roomOne
+//9 is roomTwo
 //https://www.youtube.com/watch?v=j-ZLDEnhT3Q 12:37
 void setup() {
   size(800, 500);
@@ -95,7 +96,7 @@ void draw() {
     }
   } else if (currentWindow==2) {
     playGame();
-    if (currentWindow==7) {
+    if (currentWindow==8) {
       resetRoom();
       background(100);
       characterX=32;
@@ -113,6 +114,7 @@ void draw() {
   } else if (currentWindow==5) {
   } else if (currentWindow==6) {
   } else if (currentWindow==7) {
+  } else if (currentWindow==8) {
     roomOne();
     //Room One
   }
@@ -123,6 +125,15 @@ void roomOne() {  //This will most likely have to change
   moveCharacter();
   guiPopup();
   drawRoomOne();
+  winPlatform();
+}
+void winPlatform() {
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  if (playerMap[squareX][squareY]==7) {
+    currentWindow=7;
+    onLevel++;
+  }
 }
 void timeElasped() {
   int secondElasped=second()-startSec;
@@ -135,6 +146,9 @@ void timeElasped() {
   if (minuteElasped<0) {
     minuteElasped+=60;
     hourElasped--;
+  }
+  if (hourElasped<0) {
+    hourElasped+=24;
   }
   String outputLine="";
   if (hourElasped<10)outputLine+="0"+hourElasped+":";
@@ -154,7 +168,7 @@ void guiPopup() {
   else if (lastMove=='d')squareX++;
   squareX=max(0, squareX);
   squareY=max(0, squareY);
-  println(playerMap[squareX][squareY],squareX,squareY);
+  //println(playerMap[squareX][squareY],squareX,squareY);
   if (playerMap[squareX][squareY]==4) {
     if (keyPressed&&key==' '&&!hasMenuOpen) {
       hasMenuOpen=true;
@@ -287,6 +301,7 @@ void guiPopup() {
 void drawRoomOne() {
   int squareX=characterX/32;
   int squareY=characterY/32;
+  //println(squareX,squareY);
   if (lastMove=='w')squareY--;
   else if (lastMove=='a')squareX--;
   else if (lastMove=='s')squareY++;
@@ -319,6 +334,7 @@ void setupRoomOne() {
   //4 note
   //5 locked wall
   //6 ice floor
+  //7 win platform
   //itemMap
   //lockPassKey
   //noteMap
@@ -353,6 +369,14 @@ void setupRoomOne() {
     +"next puzzle.";
   playerMap[10][6]=5;
   lockPassKey[10][6]=2111;
+  playerMap[10][4]=1;
+  playerMap[11][2]=1;
+  playerMap[8][3]=4;
+  noteMap[8][3]="This will be the last message\n"
+    +"you\'ll be hearing from me.\n"
+    +"See you at the end!";
+  playerMap[13][3]=0;
+  playerMap[3][2]=7;
 }
 void resetRoom() {
   hasControl=true;
@@ -385,7 +409,7 @@ void resetRoom() {
 }
 void playGame() {
   if (hasWentToCharacter) {
-    currentWindow=7;
+    currentWindow=onLevel;
   } else {
     background(#ff6700 );
     fill(0);
@@ -445,6 +469,10 @@ void drawMap() {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
         image(lockedWall, 32*i, 32*j);
+      }else if(playerMap[i][j]==7){
+        stroke(100,200,100);
+        fill(100,200,100);
+        rect(32*i, 32*j, 31, 31);
       }
       if (playerMap[i][j]==6) {
         image(iceFloor, 32*i, 32*j);
@@ -519,7 +547,9 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterBackOne();
         else characterBackTwo();
-        if (playerMap[characterGridX][characterGridY-1]!=0&&playerMap[characterGridX][characterGridY-1]!=6) {
+        if (playerMap[characterGridX][characterGridY-1]!=0
+          &&playerMap[characterGridX][characterGridY-1]!=6
+          &&playerMap[characterGridX][characterGridY-1]!=7) {
 
           if (moveCharacterMoves>4) {
             characterY+=10;
@@ -534,7 +564,9 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterLeftOne();
         else characterLeftTwo();
-        if (playerMap[characterGridX-1][characterGridY]!=0&&playerMap[characterGridX-1][characterGridY]!=6) {
+        if (playerMap[characterGridX-1][characterGridY]!=0
+          &&playerMap[characterGridX-1][characterGridY]!=6
+          &&playerMap[characterGridX-1][characterGridY]!=7) {
 
           if (moveCharacterMoves>4) {
             characterX+=10;
@@ -549,7 +581,9 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterFwdOne();
         else characterFwdTwo();
-        if (playerMap[characterGridX][characterGridY+1]!=0&&playerMap[characterGridX][characterGridY+1]!=6) {
+        if (playerMap[characterGridX][characterGridY+1]!=0
+          &&playerMap[characterGridX][characterGridY+1]!=6
+          &&playerMap[characterGridX][characterGridY+1]!=7) {
           if (moveCharacterMoves>4) {
             characterY-=10;
             hasControl=true;
@@ -563,7 +597,9 @@ void moveCharacter() {
         }
         if (moveCharacterMoves%2==0) characterRightOne();
         else characterRightTwo();
-        if (playerMap[characterGridX+1][characterGridY]!=0&&playerMap[characterGridX+1][characterGridY]!=6) {
+        if (playerMap[characterGridX+1][characterGridY]!=0
+          &&playerMap[characterGridX+1][characterGridY]!=6
+          &&playerMap[characterGridX+1][characterGridY]!=7) {
           if (moveCharacterMoves>4) {
             characterX-=10;
             hasControl=true;
@@ -572,15 +608,16 @@ void moveCharacter() {
       }
       moveCharacterFrame%=1;//This will be the FPS of the character
       if (moveCharacterMoves==16) {
-        if(playerMap[characterGridX][characterGridY]==0)
-        hasControl=true;
+        characterGridX=characterX/32;
+        characterGridY=characterY/32;
+        if (playerMap[characterGridX][characterGridY]==0
+          ||playerMap[characterGridX][characterGridY]==7)
+          hasControl=true;
         moveCharacterMoves=0;
         moveCharacterFrame=0;
-        characterGridX=characterX/32;
-      characterGridY=characterY/32;
       }
+      println(playerMap[characterGridX][characterGridY], characterGridX, characterGridY, moveCharacterMoves);
     }
-    //println(characterGridX+" "+characterGridY);
   }
 }
 void drawColourSquare() {
