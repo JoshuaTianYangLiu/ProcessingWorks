@@ -41,10 +41,7 @@ String noteMessage;
 boolean hasUnlocked;
 int onLevel=8;
 int startSec, startMin, startHr;
-String numToWord[]={"One", "Two", "Three", "Four", "Five"};
-int secondElasped=second()-startSec;
-int minuteElasped=minute()-startMin;
-int hourElasped=hour()-startHr;
+
 //Room One
 PImage roomOneGrid, roomOneGridPuzzle;
 boolean rOHasMenuOpen=false;
@@ -99,20 +96,16 @@ void draw() {
     }
   } else if (currentWindow==2) {
     playGame();
-    if (currentWindow>=8&&currentWindow<=12) {  //Change this if needed
+    if (currentWindow==8) {
       resetRoom();
       background(100);
       characterX=32;
       characterY=32;
+      setupRoomOne();
       startSec=second();
       startMin=minute();
       startHr=hour();
     }
-    if(currentWindow==8)setupRoomOne();
-    else if(currentWindow==9)setupRoomTwo();
-    //else if(currentWindow==10)setupRoomThree();
-    //else if(currentWindow==11)setupRoomFour();
-    //else if(currentWindow==12)setupRoomFive();
     //Most likely this will switch to multiple methods needing multiple values for each room
   } else if (currentWindow==3) {
   } else if (currentWindow==4) {
@@ -122,66 +115,11 @@ void draw() {
   } else if (currentWindow==6) {
   } else if (currentWindow==7) {
     background(100, 200, 100);
-    winScreen();
-    if (currentWindow>=8&&currentWindow<=12) {  //Change this if needed
-      resetRoom();
-      background(100);
-      characterX=32;
-      characterY=32;
-      startSec=second();
-      startMin=minute();
-      startHr=hour();
-    }
-    if(currentWindow==8)setupRoomOne();
-    else if(currentWindow==9)setupRoomTwo();
-    //else if(currentWindow==10)setupRoomThree();
-    //else if(currentWindow==11)setupRoomFour();
-    //else if(currentWindow==12)setupRoomFive();
   } else if (currentWindow==8) {
     roomOne();
     //Room One
-  }else if(currentWindow==9){
-    roomTwo();
   }
   println(mouseX/32, mouseY/32);
-}
-void winScreen() {
-  textSize(80);
-  textAlign(CENTER);
-  text("Room "+numToWord[onLevel-8]+"\nCompleted!", 400, 100);
-  textSize(30);
-  text("Time: "+hourElasped+"h "+minuteElasped+"m "+secondElasped+"s", 400, 250);
-  textAlign(LEFT);
-  text("Main Menu", 50, 400);
-  text("Next Level", 600, 400);
-  noFill();
-  strokeWeight(5);
-  if (mouseX>=45&&mouseX<=210&&mouseY>=365&&mouseY<=415) {
-    rect(45, 365, 165, 50);
-    if(mousePressed){
-      currentWindow=1;
-      onLevel++;
-    }
-  } else if (mouseX>=595&&mouseX<=745&&mouseY>=365&&mouseY<=415) {
-    rect(595, 365, 150, 50);
-    if(mousePressed)currentWindow=++onLevel;
-  }
-  strokeWeight(1);
-}
-void roomTwo(){
-  drawMap();
-  timeElasped();
-  //Add images
-  moveCharacter();
-  guiPopup();
-  drawRoomTwo();
-  winPlatform();
-}
-void setupRoomTwo(){
-
-}
-void drawRoomTwo(){
-
 }
 void roomOne() {  //This will most likely have to change
   drawMap();
@@ -250,7 +188,6 @@ void setupRoomOne() {
     +"need to forget who you were and\n"
     +"focus on who you are now.\n";
   playerMap[3][6]=5;
-  playerMap[3][6]=0; //Delete this
   lockPassKey[3][6]=1342;
   itemMap[3][6]=0;
   for (int i=0; i<13; i++)playerMap[13][i]=1;
@@ -265,7 +202,6 @@ void setupRoomOne() {
     +"next puzzle.\n"
     +"Answer is 2019";
   playerMap[10][6]=5;
-  playerMap[10][6]=0;  //Delete this
   lockPassKey[10][6]=2019;
   playerMap[10][4]=1;
   playerMap[11][2]=1;
@@ -274,23 +210,14 @@ void setupRoomOne() {
     +"you\'ll be hearing from me.\n"
     +"See you at the end!";
   playerMap[13][3]=6;
+  playerMap[17][6]=1;
   playerMap[19][3]=1;
-  playerMap[15][7]=1;
+  playerMap[18][9]=1;
+  playerMap[15][8]=1;
   playerMap[14][2]=1;
   playerMap[21][1]=1;
-  playerMap[21][8]=1;
-  playerMap[22][4]=1;
-  playerMap[16][11]=1;
-  playerMap[18][5]=1;
-  playerMap[17][2]=1;
-  playerMap[18][10]=1;
-  playerMap[19][9]=1;
-  playerMap[23][6]=1;
-  playerMap[17][8]=1;
-  playerMap[19][11]=1;
-  playerMap[23][9]=1;
-  playerMap[23][7]=1;
-  playerMap[2][2]=7;//del this
+  playerMap[20][8]=1;
+  playerMap[23][4]=1;
   playerMap[22][10]=7;
 }
 void winPlatform() {
@@ -298,12 +225,13 @@ void winPlatform() {
   int squareY=characterY/32;
   if (playerMap[squareX][squareY]==7) {
     currentWindow=7;
+    onLevel++;
   }
 }
 void timeElasped() {
-  secondElasped=second()-startSec;
-  minuteElasped=minute()-startMin;
-  hourElasped=hour()-startHr;
+  int secondElasped=second()-startSec;
+  int minuteElasped=minute()-startMin;
+  int hourElasped=hour()-startHr;
   if (secondElasped<0) {
     secondElasped+=60;
     minuteElasped--;
