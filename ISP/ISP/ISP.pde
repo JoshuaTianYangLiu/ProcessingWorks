@@ -1,4 +1,4 @@
-int currentWindow=1;
+int currentWindow=0;
 int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
@@ -45,9 +45,12 @@ String numToWord[]={"One", "Two", "Three", "Four", "Five"};
 int secondElasped=second()-startSec;
 int minuteElasped=minute()-startMin;
 int hourElasped=hour()-startHr;
+boolean spaceBeenPressed=false;
 //Room One
 PImage roomOneGrid, roomOneGridPuzzle;
 boolean rOHasMenuOpen=false;
+//Room Two
+PImage roomTwoShape;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -73,6 +76,7 @@ void setup() {
 
   roomOneGrid=loadImage("RoomOnePuzzleGrid.png");
   roomOneGridPuzzle=loadImage("RoomOnePuzzleGridPuzzle.png");
+  roomTwoShape=loadImage("RoomTwoShapes.png");
 }
 void draw() {
   if (currentWindow==0) {
@@ -172,13 +176,19 @@ void roomTwo(){
   drawMap();
   timeElasped();
   //Add images
+  image(roomTwoShape,32,224);
   moveCharacter();
   guiPopup();
   drawRoomTwo();
   winPlatform();
 }
 void setupRoomTwo(){
-
+  for(int i=0; i<25; i++)playerMap[i][6]=1;
+  for(int i=1; i<12; i++){
+    playerMap[8][i]=1;
+    playerMap[16][i]=1;
+  }
+  
 }
 void drawRoomTwo(){
 
@@ -250,7 +260,7 @@ void setupRoomOne() {
     +"need to forget who you were and\n"
     +"focus on who you are now.\n";
   playerMap[3][6]=5;
-  playerMap[3][6]=0; //Delete this
+  //playerMap[3][6]=0; //Delete this
   lockPassKey[3][6]=1342;
   itemMap[3][6]=0;
   for (int i=0; i<13; i++)playerMap[13][i]=1;
@@ -265,7 +275,7 @@ void setupRoomOne() {
     +"next puzzle.\n"
     +"Answer is 2019";
   playerMap[10][6]=5;
-  playerMap[10][6]=0;  //Delete this
+  //playerMap[10][6]=0;  //Delete this
   lockPassKey[10][6]=2019;
   playerMap[10][4]=1;
   playerMap[11][2]=1;
@@ -281,16 +291,14 @@ void setupRoomOne() {
   playerMap[21][8]=1;
   playerMap[22][4]=1;
   playerMap[16][11]=1;
-  playerMap[18][5]=1;
+  playerMap[18][4]=1;
   playerMap[17][2]=1;
   playerMap[18][10]=1;
   playerMap[19][9]=1;
-  playerMap[23][6]=1;
+  playerMap[23][5]=1;
   playerMap[17][8]=1;
   playerMap[19][11]=1;
-  playerMap[23][9]=1;
-  playerMap[23][7]=1;
-  playerMap[2][2]=7;//del this
+  //playerMap[2][2]=7;//del this
   playerMap[22][10]=7;
 }
 void winPlatform() {
@@ -335,9 +343,10 @@ void guiPopup() {
   squareY=max(0, squareY);
   //println(playerMap[squareX][squareY],squareX,squareY);
   if (playerMap[squareX][squareY]==4) {
-    if (keyPressed&&key==' '&&!hasMenuOpen) {
+    if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {
       hasMenuOpen=true;
       noteMessage="";
+      spaceBeenPressed=false;
     }
     if (hasMenuOpen) {
       image(paperNote, 0, 0);
@@ -352,10 +361,13 @@ void guiPopup() {
       }
       fill(0);
       text(noteMessage+"_", 150, 100);
-      if (mousePressed||(keyPressed&&key!=' '))hasMenuOpen=false;
+      if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))hasMenuOpen=false;
+      if(!keyPressed)spaceBeenPressed=true;
+    }else{
+      if(!keyPressed)spaceBeenPressed=false;
     }
   } else if (playerMap[squareX][squareY]==2||playerMap[squareX][squareY]==5) {  //Maybe switch 5 to its own if
-    if (keyPressed&&key==' '&&!hasMenuOpen) {
+    if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {
       hasMenuOpen=true;
       for (int i=0; i<4; i++) {
         finalValue[i]=0;
@@ -367,6 +379,7 @@ void guiPopup() {
       shackleY=0;
       numComb=0;
       hasUnlocked=false;
+      spaceBeenPressed=false;
     }
     if (hasMenuOpen) {
 
@@ -449,7 +462,10 @@ void guiPopup() {
       }
       if (!isInOneSection)colourSection=0;
       if (lockPassKey[squareX][squareY]==numComb)hasUnlocked=true;
-      if (keyPressed&&key!=' ')hasMenuOpen=false;
+      if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))hasMenuOpen=false;
+      if(!keyPressed)spaceBeenPressed=true;
+    }else{
+      if(!keyPressed)spaceBeenPressed=false;
     }
   } else if (playerMap[squareX][squareY]==3) {
     if (keyPressed&&key==' ') {
