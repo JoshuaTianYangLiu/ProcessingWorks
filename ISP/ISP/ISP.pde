@@ -39,7 +39,7 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
-int onLevel=8;
+int onLevel=9;
 int startSec, startMin, startHr;
 String numToWord[]={"One", "Two", "Three", "Four", "Five"};
 int secondElasped=second()-startSec;
@@ -213,18 +213,18 @@ void drawRoomOne() {
   squareY=max(0, squareY);
   if (playerMap[squareX][squareY]==4) {
     if (squareX==3&&squareY==9) {
-      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
+      if (keyPressed&&key==' '&&!rOHasMenuOpen&&!spaceBeenPressed) {
         rOHasMenuOpen=true;
       } else if (rOHasMenuOpen) {
         image(roomOneGrid, 0, 0);
-        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
+        if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))rOHasMenuOpen=false;
       }
     } else if (squareX==6&&squareY==9) {
-      if (keyPressed&&key==' '&&!rOHasMenuOpen) {
+      if (keyPressed&&key==' '&&!rOHasMenuOpen&&!spaceBeenPressed) {
         rOHasMenuOpen=true;
       } else if (rOHasMenuOpen) {
         image(roomOneGridPuzzle, 0, 0);
-        if (keyPressed&&key!=' '||mousePressed)rOHasMenuOpen=false;
+        if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))rOHasMenuOpen=false;
       }
     }
   }
@@ -259,8 +259,7 @@ void setupRoomOne() {
     +"To escape your first room, you\n"
     +"need to forget who you were and\n"
     +"focus on who you are now.\n";
-  playerMap[3][6]=5;
-  //playerMap[3][6]=0; //Delete this
+  playerMap[3][6]=5; 
   lockPassKey[3][6]=1342;
   itemMap[3][6]=0;
   for (int i=0; i<13; i++)playerMap[13][i]=1;
@@ -462,7 +461,7 @@ void guiPopup() {
       }
       if (!isInOneSection)colourSection=0;
       if (lockPassKey[squareX][squareY]==numComb)hasUnlocked=true;
-      if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))hasMenuOpen=false;
+      if (keyPressed&&(key!=' '||spaceBeenPressed))hasMenuOpen=false;
       if(!keyPressed)spaceBeenPressed=true;
     }else{
       if(!keyPressed)spaceBeenPressed=false;
