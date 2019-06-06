@@ -50,7 +50,7 @@ boolean spaceBeenPressed=false;
 PImage roomOneGrid, roomOneGridPuzzle;
 boolean rOHasMenuOpen=false;
 //Room Two
-PImage roomTwoShape;
+PImage roomTwoShape, roomTwoColourPuzzle, roomTwoCodePuzzle;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -77,6 +77,8 @@ void setup() {
   roomOneGrid=loadImage("RoomOnePuzzleGrid.png");
   roomOneGridPuzzle=loadImage("RoomOnePuzzleGridPuzzle.png");
   roomTwoShape=loadImage("RoomTwoShapes.png");
+  roomTwoColourPuzzle=loadImage("RoomTwoColourPuzzle.png");
+  roomTwoCodePuzzle=loadImage("RoomTwoCodePuzzle.png");
 }
 void draw() {
   if (currentWindow==0) {
@@ -112,9 +114,9 @@ void draw() {
       startMin=minute();
       startHr=hour();
     }
-    if(currentWindow==8)setupRoomOne();
-    else if(currentWindow==9)setupRoomTwo();
-    //else if(currentWindow==10)setupRoomThree();
+    if (currentWindow==8)setupRoomOne();
+    else if (currentWindow==9)setupRoomTwo();
+    else if(currentWindow==10)setupRoomThree();
     //else if(currentWindow==11)setupRoomFour();
     //else if(currentWindow==12)setupRoomFive();
     //Most likely this will switch to multiple methods needing multiple values for each room
@@ -136,16 +138,18 @@ void draw() {
       startMin=minute();
       startHr=hour();
     }
-    if(currentWindow==8)setupRoomOne();
-    else if(currentWindow==9)setupRoomTwo();
-    //else if(currentWindow==10)setupRoomThree();
+    if (currentWindow==8)setupRoomOne();
+    else if (currentWindow==9)setupRoomTwo();
+    else if(currentWindow==10)setupRoomThree();
     //else if(currentWindow==11)setupRoomFour();
     //else if(currentWindow==12)setupRoomFive();
   } else if (currentWindow==8) {
     roomOne();
     //Room One
-  }else if(currentWindow==9){
+  } else if (currentWindow==9) {
     roomTwo();
+  }else if(currentWindow==10){
+    roomThree();
   }
   println(mouseX/32, mouseY/32);
 }
@@ -162,74 +166,35 @@ void winScreen() {
   strokeWeight(5);
   if (mouseX>=45&&mouseX<=210&&mouseY>=365&&mouseY<=415) {
     rect(45, 365, 165, 50);
-    if(mousePressed){
+    if (mousePressed) {
       currentWindow=1;
       onLevel++;
     }
   } else if (mouseX>=595&&mouseX<=745&&mouseY>=365&&mouseY<=415) {
     rect(595, 365, 150, 50);
-    if(mousePressed)currentWindow=++onLevel;
+    if (mousePressed)currentWindow=++onLevel;
   }
   strokeWeight(1);
 }
-void roomTwo(){
+void roomThree(){
   drawMap();
   timeElasped();
-  //Add images
-  image(roomTwoShape,32,224);
   moveCharacter();
   guiPopup();
   drawRoomTwo();
   winPlatform();
 }
-void setupRoomTwo(){
-  for(int i=0; i<25; i++)playerMap[i][6]=1;
-  for(int i=1; i<12; i++){
-    playerMap[8][i]=1;
-    playerMap[16][i]=1;
-  }
-  
-}
-void drawRoomTwo(){
-
-}
-void roomOne() {  //This will most likely have to change
+void roomTwo() {
   drawMap();
   timeElasped();
+  //Add images
+  image(roomTwoShape, 32, 224);
   moveCharacter();
   guiPopup();
-  drawRoomOne();
+  drawRoomTwo();
   winPlatform();
 }
-void drawRoomOne() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  //println(squareX,squareY);
-  if (lastMove=='w')squareY--;
-  else if (lastMove=='a')squareX--;
-  else if (lastMove=='s')squareY++;
-  else if (lastMove=='d')squareX++;
-  squareX=max(0, squareX);
-  squareY=max(0, squareY);
-  if (playerMap[squareX][squareY]==4) {
-    if (squareX==3&&squareY==9) {
-      if (keyPressed&&key==' '&&!rOHasMenuOpen&&!spaceBeenPressed) {
-        rOHasMenuOpen=true;
-      } else if (rOHasMenuOpen) {
-        image(roomOneGrid, 0, 0);
-        if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))rOHasMenuOpen=false;
-      }
-    } else if (squareX==6&&squareY==9) {
-      if (keyPressed&&key==' '&&!rOHasMenuOpen&&!spaceBeenPressed) {
-        rOHasMenuOpen=true;
-      } else if (rOHasMenuOpen) {
-        image(roomOneGridPuzzle, 0, 0);
-        if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))rOHasMenuOpen=false;
-      }
-    }
-  }
-}
-void setupRoomOne() {
+void setupRoomTwo() {
   //0 floor
   //1 wall
   //2 locked box
@@ -242,6 +207,87 @@ void setupRoomOne() {
   //lockPassKey
   //noteMap
   //playerMap
+  for (int i=0; i<25; i++)playerMap[i][6]=1;
+  for (int i=1; i<12; i++) {
+    playerMap[8][i]=1;
+    playerMap[16][i]=1;
+  }
+  playerMap[4][3]=4;
+  noteMap[4][3]="Welcome to your second room,\n"
+    +"in here we'll go back to the basics.\n"
+    +"1, 2, 3, 8, pineapple?";
+  playerMap[8][3]=0;
+  lockPassKey[8][3]=5694;
+  itemMap[8][3]=0;
+  playerMap[12][3]=4;
+  noteMap[12][3]="Hidden in plain sight";
+  playerMap[12][6]=0;
+  lockPassKey[12][6]=7219;
+  itemMap[12][6]=0;
+  playerMap[12][9]=4;
+  noteMap[12][9]="Story idea,\n\n"
+    +"Till recently, Issac's artistic naming gave\n"
+    +"lasting echos. Since questions ultimately\n"
+    +"arose relating equally. People eventually\n"
+    +"named the artist Galvin on November.\n"
+    +"Carrying its reasons can leave evidence";
+  playerMap[16][9]=0;
+  lockPassKey[16][9]=7557;
+  itemMap[16][9]=0;
+  playerMap[20][9]=4;
+  playerMap[20][6]=0;
+  lockPassKey[20][6]=5259;
+  itemMap[20][6]=0;
+  for (int i=17; i<24; i++) {
+    for (int j=1; j<6; j++)playerMap[i][j]=6;
+  }
+  playerMap[20][4]=1;
+  playerMap[23][5]=1;
+  playerMap[22][2]=1;
+  playerMap[21][1]=1;
+  playerMap[17][4]=1;
+  playerMap[18][2]=7;
+  playerMap[18][5]=1;
+}
+void drawRoomTwo() {
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  //println(squareX,squareY);
+  if (lastMove=='w')squareY--;
+  else if (lastMove=='a')squareX--;
+  else if (lastMove=='s')squareY++;
+  else if (lastMove=='d')squareX++;
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==4) {
+    if (squareX==4&&squareY==3) {
+      if (hasMenuOpen) {
+        image(roomTwoColourPuzzle, 0, 0);
+      }
+    } else if (squareX==12&&squareY==3) {
+      if (hasMenuOpen) {
+        println(" --   --        --");
+        println("   |    |    | |   |");
+        println("      --        --");
+        println("   | |       |     |");
+        println("      --        --");
+      }
+    } else if (squareX==20&&squareY==9) {
+      if (hasMenuOpen) {
+        image(roomTwoCodePuzzle, 0, 0);
+      }
+    }
+  }
+}
+void roomOne() {
+  drawMap();
+  timeElasped();
+  moveCharacter();
+  guiPopup();
+  drawRoomOne();
+  winPlatform();
+}
+void setupRoomOne() {
   for (int i=8; i<24; i++) {
     for (int j=1; j<6; j++)playerMap[i][j]=6;
   }
@@ -300,6 +346,29 @@ void setupRoomOne() {
   //playerMap[2][2]=7;//del this
   playerMap[22][10]=7;
 }
+void drawRoomOne() {
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  //println(squareX,squareY);
+  if (lastMove=='w')squareY--;
+  else if (lastMove=='a')squareX--;
+  else if (lastMove=='s')squareY++;
+  else if (lastMove=='d')squareX++;
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==4) {
+    if (squareX==3&&squareY==9) {
+      if (hasMenuOpen) {
+        image(roomOneGrid, 0, 0);
+      }
+    } else if (squareX==6&&squareY==9) {
+      if (hasMenuOpen) {
+        image(roomOneGridPuzzle, 0, 0);
+      }
+    }
+  }
+}
+
 void winPlatform() {
   int squareX=characterX/32;
   int squareY=characterY/32;
@@ -361,9 +430,9 @@ void guiPopup() {
       fill(0);
       text(noteMessage+"_", 150, 100);
       if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))hasMenuOpen=false;
-      if(!keyPressed)spaceBeenPressed=true;
-    }else{
-      if(!keyPressed)spaceBeenPressed=false;
+      if (!keyPressed)spaceBeenPressed=true;
+    } else {
+      if (!keyPressed)spaceBeenPressed=false;
     }
   } else if (playerMap[squareX][squareY]==2||playerMap[squareX][squareY]==5) {  //Maybe switch 5 to its own if
     if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {
@@ -462,9 +531,9 @@ void guiPopup() {
       if (!isInOneSection)colourSection=0;
       if (lockPassKey[squareX][squareY]==numComb)hasUnlocked=true;
       if (keyPressed&&(key!=' '||spaceBeenPressed))hasMenuOpen=false;
-      if(!keyPressed)spaceBeenPressed=true;
-    }else{
-      if(!keyPressed)spaceBeenPressed=false;
+      if (!keyPressed)spaceBeenPressed=true;
+    } else {
+      if (!keyPressed)spaceBeenPressed=false;
     }
   } else if (playerMap[squareX][squareY]==3) {
     if (keyPressed&&key==' ') {
