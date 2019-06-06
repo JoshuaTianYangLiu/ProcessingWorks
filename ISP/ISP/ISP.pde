@@ -151,7 +151,7 @@ void draw() {
   }else if(currentWindow==10){
     roomThree();
   }
-  println(mouseX/32, mouseY/32);
+  //println(mouseX/32, mouseY/32);
 }
 void winScreen() {
   textSize(80);
@@ -181,20 +181,10 @@ void roomThree(){
   timeElasped();
   moveCharacter();
   guiPopup();
-  drawRoomTwo();
+  drawRoomThree();
   winPlatform();
 }
-void roomTwo() {
-  drawMap();
-  timeElasped();
-  //Add images
-  image(roomTwoShape, 32, 224);
-  moveCharacter();
-  guiPopup();
-  drawRoomTwo();
-  winPlatform();
-}
-void setupRoomTwo() {
+void setupRoomThree(){
   //0 floor
   //1 wall
   //2 locked box
@@ -207,6 +197,21 @@ void setupRoomTwo() {
   //lockPassKey
   //noteMap
   //playerMap
+  playerMap[5][7]=1;
+}
+void drawRoomThree(){
+  
+}
+void roomTwo() {
+  drawMap();
+  timeElasped();
+  image(roomTwoShape, 32, 224);
+  moveCharacter();
+  guiPopup();
+  drawRoomTwo();
+  winPlatform();
+}
+void setupRoomTwo() {
   for (int i=0; i<25; i++)playerMap[i][6]=1;
   for (int i=1; i<12; i++) {
     playerMap[8][i]=1;
@@ -216,12 +221,12 @@ void setupRoomTwo() {
   noteMap[4][3]="Welcome to your second room,\n"
     +"in here we'll go back to the basics.\n"
     +"1, 2, 3, 8, pineapple?";
-  playerMap[8][3]=0;
+  playerMap[8][3]=5;
   lockPassKey[8][3]=5694;
   itemMap[8][3]=0;
   playerMap[12][3]=4;
   noteMap[12][3]="Hidden in plain sight";
-  playerMap[12][6]=0;
+  playerMap[12][6]=5;
   lockPassKey[12][6]=7219;
   itemMap[12][6]=0;
   playerMap[12][9]=4;
@@ -231,11 +236,11 @@ void setupRoomTwo() {
     +"arose relating equally. People eventually\n"
     +"named the artist Galvin on November.\n"
     +"Carrying its reasons can leave evidence";
-  playerMap[16][9]=0;
+  playerMap[16][9]=5;
   lockPassKey[16][9]=7557;
   itemMap[16][9]=0;
   playerMap[20][9]=4;
-  playerMap[20][6]=0;
+  playerMap[20][6]=5;
   lockPassKey[20][6]=5259;
   itemMap[20][6]=0;
   for (int i=17; i<24; i++) {
@@ -653,7 +658,7 @@ void drawMap() {
   if (mouseX>=340&&mouseX<=500&&mouseY>=430&&mouseY<=480) {
     fill(150, 150, 250);
     stroke(150, 150, 250);
-    if (mousePressed) {
+    if (mousePressed&&!hasMenuOpen) {
       currentWindow=2;
       delay(100);
     }
