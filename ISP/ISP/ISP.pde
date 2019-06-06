@@ -1,4 +1,4 @@
-int currentWindow=0;
+int currentWindow=1;
 int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
