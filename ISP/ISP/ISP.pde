@@ -59,6 +59,9 @@ boolean roomThreeStacker[][]=new boolean[6][8];
 int roomThreeStackerPos=0;
 boolean roomThreeIsGoingRight=true;
 int roomThreeStackerLayer=8;
+boolean roomThreeButtonOn=false;
+int roomThreeReactionTime=0;
+int roomThreeClickScore=0;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -220,6 +223,10 @@ void setupRoomThree() {
   noteMap[6][3]="1";
   playerMap[6][5]=8;
   noteMap[6][5]="2";
+  playerMap[6][7]=8;
+  noteMap[6][7]="3";
+  playerMap[6][9]=8;
+  noteMap[6][9]="4";
 }
 void drawRoomThree() {
   int squareX=characterX/32;
@@ -361,11 +368,107 @@ void drawRoomThree() {
           }
         }
       }
-    }else if(squareX==6&&squareY==7){
-      if(hasMenuOpen){
+    } else if (squareX==6&&squareY==7) {
+      if (hasMenuOpen) {
+        noStroke();
+        textSize(28);
+        fill(0);
+        text("<=250ms", 150, 250);
+        if (roomThreeReactionTime<=250&&roomThreeReactionTime!=0&&!roomThreeButtonOn) {
+          fill(100, 200, 100);
+          ellipse(400, 250, 250, 250);
+          text(roomThreeReactionTime, 375, 100);
+          if (millis()-timeSolved>2000) {
+            hasMenuOpen=false;
+            timeSolved=-1;
+            playerMap[6][7]=4;
+          }
+        } else if (roomThreeButtonOn) {
+          roomThreeReactionTime=millis()-timeSolved;
+          text(roomThreeReactionTime, 375, 100);
+          if (roomThreeReactionTime>1000) {
+            roomThreeButtonOn=false;
+            timeSolved=millis();
+          }
+          if (mousePressed||(keyPressed&&key==' ')) {
+            roomThreeButtonOn=false;
+            timeSolved=millis();
+            spaceBeenPressed=true;
+          }
+          fill(100, 200, 100);
+          ellipse(400, 250, 250, 250);
+        } else {
+          if (!keyPressed||timeSolved!=-1) {
+            if (timeSolved==-1)timeSolved=millis();
+
+            if (millis()-timeSolved>3000) {
+              roomThreeButtonOn=true;
+              timeSolved=millis();
+            }
+            fill(200, 100, 100);
+            if (mousePressed||(keyPressed&&key==' ')) {
+              timeSolved=millis();
+              if (!spaceBeenPressed) fill(0);
+            } else if (!mousePressed||(keyPressed&&key==' ')) {
+              spaceBeenPressed=false;
+            }
+            ellipse(400, 250, 250, 250);
+            fill(0);
+            if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)text(roomThreeReactionTime, 375, 100);
+            else text("000", 375, 100);
+          } else {
+            fill(200, 100, 100);
+            ellipse(400, 250, 250, 250);
+            fill(0);
+            if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)text(roomThreeReactionTime, 375, 100);
+            else text("000", 375, 100);
+          }
+        }
+      }
+    } else if (squareX==6&&squareY==9) {
+      if (hasMenuOpen) {
+        //deal with stroke
         
+        if (roomThreeClickScore==70) {
+          fill(100,200,100);
+          text(roomThreeClickScore+"    "+roomThreeReactionTime, 300, 100);
+          rect(180, 120, 440, 250);
+          if(millis()-timeSolved>1000){
+            hasMenuOpen=false;
+            timeSolved=-1;
+            playerMap[6][9]=4;
+          }
+        } else {
+          roomThreeReactionTime=millis()-timeSolved;
+          if (roomThreeReactionTime>10000) {
+            timeSolved=-1;
+            roomThreeClickScore=0;
+          }
+          fill(0);
+          if (timeSolved==-1)text(roomThreeClickScore+"    000", 300, 100);
+          else text(roomThreeClickScore+"    "+roomThreeReactionTime, 300, 100);
+          if (mousePressed) {
+
+            if (mouseBeenPressed&&timeSolved!=-1) {
+              mouseBeenPressed=false;
+              roomThreeClickScore++;
+            } else if (timeSolved==-1) {
+              timeSolved=millis();
+            }
+            fill(230);
+          } else {
+            mouseBeenPressed=true;
+            noFill();
+          }
+          if(roomThreeClickScore==70)timeSolved=millis();
+          println(roomThreeClickScore);
+          rect(180, 120, 440, 250);
+        }
       }
     }
+  } else {
+    timeSolved=-1;
+    roomThreeReactionTime=0;
   }
 }
 void roomTwo() {
