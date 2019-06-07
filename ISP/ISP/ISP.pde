@@ -39,18 +39,26 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
-int onLevel=9;
+int onLevel=10;
 int startSec, startMin, startHr;
 String numToWord[]={"One", "Two", "Three", "Four", "Five"};
 int secondElasped=second()-startSec;
 int minuteElasped=minute()-startMin;
 int hourElasped=hour()-startHr;
 boolean spaceBeenPressed=false;
+boolean mouseBeenPressed=false;
+int timeSolved=-1;
 //Room One
 PImage roomOneGrid, roomOneGridPuzzle;
 boolean rOHasMenuOpen=false;
 //Room Two
 PImage roomTwoShape, roomTwoColourPuzzle, roomTwoCodePuzzle;
+//Room Three
+boolean roomThreeLightPuzzle[][]=new boolean[7][5];
+boolean roomThreeStacker[][]=new boolean[6][8];
+int roomThreeStackerPos=0;
+boolean roomThreeIsGoingRight=true;
+int roomThreeStackerLayer=8;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -116,7 +124,7 @@ void draw() {
     }
     if (currentWindow==8)setupRoomOne();
     else if (currentWindow==9)setupRoomTwo();
-    else if(currentWindow==10)setupRoomThree();
+    else if (currentWindow==10)setupRoomThree();
     //else if(currentWindow==11)setupRoomFour();
     //else if(currentWindow==12)setupRoomFive();
     //Most likely this will switch to multiple methods needing multiple values for each room
@@ -140,7 +148,7 @@ void draw() {
     }
     if (currentWindow==8)setupRoomOne();
     else if (currentWindow==9)setupRoomTwo();
-    else if(currentWindow==10)setupRoomThree();
+    else if (currentWindow==10)setupRoomThree();
     //else if(currentWindow==11)setupRoomFour();
     //else if(currentWindow==12)setupRoomFive();
   } else if (currentWindow==8) {
@@ -148,7 +156,7 @@ void draw() {
     //Room One
   } else if (currentWindow==9) {
     roomTwo();
-  }else if(currentWindow==10){
+  } else if (currentWindow==10) {
     roomThree();
   }
   //println(mouseX/32, mouseY/32);
@@ -176,7 +184,7 @@ void winScreen() {
   }
   strokeWeight(1);
 }
-void roomThree(){
+void roomThree() {
   drawMap();
   timeElasped();
   moveCharacter();
@@ -184,7 +192,7 @@ void roomThree(){
   drawRoomThree();
   winPlatform();
 }
-void setupRoomThree(){
+void setupRoomThree() {
   //0 floor
   //1 wall
   //2 locked box
@@ -193,14 +201,172 @@ void setupRoomThree(){
   //5 locked wall
   //6 ice floor
   //7 win platform
+  //8 special
   //itemMap
   //lockPassKey
   //noteMap
   //playerMap
-  playerMap[5][7]=1;
+  for (int i=0; i<20; i++) {
+    int puzzleBoxX=(int)random(0, 7);
+    int puzzleBoxY=(int)random(0, 5);
+    roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY];
+    if (puzzleBoxX>0)roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY];
+    if (puzzleBoxY>0)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1];
+    if (puzzleBoxX<6)roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY];
+    if (puzzleBoxY<4)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
+  }
+  for (int i=0; i<12; i++)playerMap[12][i]=1;
+  playerMap[6][3]=8;
+  noteMap[6][3]="1";
+  playerMap[6][5]=8;
+  noteMap[6][5]="2";
 }
-void drawRoomThree(){
-  
+void drawRoomThree() {
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  //println(squareX,squareY);
+  if (lastMove=='w')squareY--;
+  else if (lastMove=='a')squareX--;
+  else if (lastMove=='s')squareY++;
+  else if (lastMove=='d')squareX++;
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==8) {
+    if (squareX==6&&squareY==3) {
+      if (hasMenuOpen) {
+        //11 7
+        for (int i=0; i<7; i++) {
+          for (int j=0; j<5; j++) {
+            if (roomThreeLightPuzzle[i][j]) {
+              fill(100, 100, 200);
+            } else {
+              fill(230);
+            }
+            rect(i*40+250, j*40+120, 32, 32);
+          }
+        }
+        int puzzleBoxX=(mouseX-250)/40;
+        int puzzleBoxY=(mouseY-120)/40;
+        if (mouseX>=250&&mouseY>=120) {
+          if (puzzleBoxX>=0&&puzzleBoxX<=6&&puzzleBoxY>=0&&puzzleBoxY<=4) {
+            fill(100, 200);
+            rect(puzzleBoxX*40+250, puzzleBoxY*40+120, 32, 32);
+          }
+          if (mousePressed) {
+            mouseBeenPressed=true;
+          } else {
+            if (mouseBeenPressed) {
+              roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY];
+              if (puzzleBoxX>0)roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY];
+              if (puzzleBoxY>0)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1];
+              if (puzzleBoxX<6)roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY];
+              if (puzzleBoxY<4)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
+            }
+            mouseBeenPressed=false;
+          }
+        }
+        boolean allLightsOn=true;
+        for (int i=0; i<7; i++) {
+          for (int j=0; j<5; j++) {
+            if (!roomThreeLightPuzzle[i][j]) {
+              allLightsOn=false;
+              break;
+            }
+          }
+        }
+        if (timeSolved!=-1&&millis()-timeSolved>1000) {
+          hasMenuOpen=false;
+          timeSolved=-1;
+          playerMap[6][3]=4;
+        }
+        if (allLightsOn) {
+          for (int i=0; i<7; i++) {
+            for (int j=0; j<5; j++) {
+              fill(100, 200, 100);
+              rect(i*40+250, j*40+120, 32, 32);
+              if (timeSolved==-1) {
+                timeSolved=millis();
+              }
+            }
+          }
+        }
+        fill(0);
+        textSize(28);
+        text("Turn all to blue.", 280, 390);
+      }
+    } else if (squareX==6&&squareY==5) {
+      if (hasMenuOpen) {
+        for (int i=0; i<6; i++) {
+          for (int j=0; j<8; j++) {
+            fill(230);
+            if (roomThreeStacker[i][j]) {
+              fill(100);
+            }
+            if (j==1)fill(200, 100, 100);
+            rect(i*40+300, j*40+80, 32, 32);
+          }
+        }
+        if (roomThreeStackerLayer==0) {
+          for (int i=0; i<6; i++) {
+            for (int j=0; j<8; j++) {
+              fill(100, 200, 100);
+              rect(i*40+300, j*40+80, 32, 32);
+            }
+          }
+          if (millis()-timeSolved>1000) {
+            hasMenuOpen=false;
+            timeSolved=-1;
+            playerMap[6][5]=4;
+          }
+        } else {
+          fill(100);
+          if (timeSolved==-1)timeSolved=millis();
+          if (millis()-timeSolved>100) {
+
+            if (roomThreeStackerPos==0)roomThreeIsGoingRight=true;
+            if (roomThreeStackerPos==5)roomThreeIsGoingRight=false;
+            if (roomThreeIsGoingRight) {
+              rect(roomThreeStackerPos++*40+300, 80, 32, 32);
+            } else {
+              rect(roomThreeStackerPos--*40+300, 80, 32, 32);
+            }
+            timeSolved=millis();
+          } else {
+            if (roomThreeIsGoingRight) {
+              rect(roomThreeStackerPos*40+300, 80, 32, 32);
+            } else {
+              rect(roomThreeStackerPos*40+300, 80, 32, 32);
+            }
+          }
+          if (keyPressed&&key==' ') {
+            if (!spaceBeenPressed) {
+              if (roomThreeStackerLayer==8)roomThreeStackerLayer--;
+              else {
+                if (roomThreeStackerLayer==7||roomThreeStacker[roomThreeStackerPos][roomThreeStackerLayer+1]) {
+                  roomThreeStacker[roomThreeStackerPos][roomThreeStackerLayer--]=true;
+                  if (roomThreeStackerLayer==0)timeSolved=millis();
+                } else {
+                  roomThreeStackerLayer=7;
+                  for (int i=0; i<6; i++) {
+                    for (int j=0; j<8; j++) {
+                      roomThreeStacker[i][j]=false;
+                    }
+                  }
+                }
+              }
+            }
+            spaceBeenPressed=true;
+          } else {
+            spaceBeenPressed=false;
+          }
+        }
+      }
+    }else if(squareX==6&&squareY==7){
+      if(hasMenuOpen){
+        
+      }
+    }
+  }
 }
 void roomTwo() {
   drawMap();
@@ -547,8 +713,19 @@ void guiPopup() {
     } else {
       playerMap[squareX][squareY]=0;
     }
-  } else if (playerMap[squareX][squareY]==5) {
-    if (keyPressed&&key==' ') {
+  } else if (playerMap[squareX][squareY]==8) {
+    if (keyPressed&&key==' '&&!hasMenuOpen) {
+      hasMenuOpen=true;
+      roomThreeStackerLayer=8;
+    }
+    if (hasMenuOpen) {
+      image(paperNote, 0, 0);
+      PFont font = loadFont("YuGothicUI-Bold-48.vlw");
+      textFont(font);
+      textSize(30);
+      fill(100);
+      text("Press any key to continue...", 200, 425);
+      if (keyPressed&&key!=' ')hasMenuOpen=false;
     }
   }
 }
@@ -600,6 +777,7 @@ void playGame() {
       fill(200, 200, 255);
       rect(300, 200, 200, 100);
       if (mousePressed)currentWindow=1;//Mainmenu
+      //TODO change range of mainmenu so that it does not overlap with levels
     } else if (mouseX<=750&&mouseX>=550&&mouseY<=300&&mouseY>=200) {
       stroke(200, 200, 255);
       fill(200, 200, 255);
@@ -631,7 +809,7 @@ void drawMap() {
           rect(32*i, 32*j, 31, 31);
         }
       }
-      if (playerMap[i][j]==1||playerMap[i][j]==6) {
+      if (playerMap[i][j]==1) {
         stroke(200);
         fill(200);
         rect(32*i, 32*j, 31, 31);
@@ -639,7 +817,7 @@ void drawMap() {
         image(lockedBox, 32*i, 32*j);
       } else if (playerMap[i][j]==3) {
         image(unlockedBox, 32*i, 32*j);
-      } else if (playerMap[i][j]==4) {
+      } else if (playerMap[i][j]==4||playerMap[i][j]==8) {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
         image(lockedWall, 32*i, 32*j);
@@ -647,8 +825,10 @@ void drawMap() {
         stroke(100, 200, 100);
         fill(100, 200, 100);
         rect(32*i, 32*j, 31, 31);
-      }
-      if (playerMap[i][j]==6) {
+      } else if (playerMap[i][j]==6) {
+        stroke(200);
+        fill(200);
+        rect(32*i, 32*j, 31, 31);
         image(iceFloor, 32*i, 32*j);
       }
     }
