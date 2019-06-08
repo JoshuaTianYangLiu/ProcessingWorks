@@ -39,7 +39,7 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
-int onLevel=10;
+int onLevel=8;
 int startSec, startMin, startHr;
 String numToWord[]={"One", "Two", "Three", "Four", "Five"};
 int secondElasped=second()-startSec;
@@ -103,6 +103,7 @@ void draw() {
       strokeWeight(1);
       size(800, 500);
     } else if (currentWindow==3) {
+      levelSelection();
     } else if (currentWindow==4) {
       strokeWeight(1);
       background(200);
@@ -116,7 +117,7 @@ void draw() {
     }
   } else if (currentWindow==2) {
     playGame();
-    if (currentWindow>=8&&currentWindow<=12) {  //Change this if needed
+    if (currentWindow>=8&&currentWindow<=10) {  //Change this if needed
       resetRoom();
       background(100);
       characterX=32;
@@ -128,9 +129,6 @@ void draw() {
     if (currentWindow==8)setupRoomOne();
     else if (currentWindow==9)setupRoomTwo();
     else if (currentWindow==10)setupRoomThree();
-    //else if(currentWindow==11)setupRoomFour();
-    //else if(currentWindow==12)setupRoomFive();
-    //Most likely this will switch to multiple methods needing multiple values for each room
   } else if (currentWindow==3) {
   } else if (currentWindow==4) {
     colourPicker();
@@ -140,7 +138,7 @@ void draw() {
   } else if (currentWindow==7) {
     background(100, 200, 100);
     winScreen();
-    if (currentWindow>=8&&currentWindow<=12) {  //Change this if needed
+    if (currentWindow>=8&&currentWindow<=10) {  //Change this if needed
       resetRoom();
       background(100);
       characterX=32;
@@ -152,17 +150,14 @@ void draw() {
     if (currentWindow==8)setupRoomOne();
     else if (currentWindow==9)setupRoomTwo();
     else if (currentWindow==10)setupRoomThree();
-    //else if(currentWindow==11)setupRoomFour();
-    //else if(currentWindow==12)setupRoomFive();
   } else if (currentWindow==8) {
     roomOne();
-    //Room One
   } else if (currentWindow==9) {
     roomTwo();
   } else if (currentWindow==10) {
     roomThree();
   }
-  //println(mouseX/32, mouseY/32);
+  println(mouseX/32, mouseY/32);
 }
 void winScreen() {
   textSize(80);
@@ -188,6 +183,9 @@ void winScreen() {
   strokeWeight(1);
 }
 void roomThree() {
+  for (int i=13; i<24; i++) {
+    for (int j=1; j<12; j++)playerMap[i][j]=6;
+  }
   drawMap();
   timeElasped();
   moveCharacter();
@@ -220,13 +218,16 @@ void setupRoomThree() {
   }
   for (int i=0; i<12; i++)playerMap[12][i]=1;
   playerMap[6][3]=8;
-  noteMap[6][3]="1";
+  noteMap[6][3]="3";
   playerMap[6][5]=8;
-  noteMap[6][5]="2";
+  noteMap[6][5]="4";
   playerMap[6][7]=8;
-  noteMap[6][7]="3";
+  noteMap[6][7]="8";
   playerMap[6][9]=8;
-  noteMap[6][9]="4";
+  noteMap[6][9]="5";
+  playerMap[12][6]=5;
+  lockPassKey[12][6]=3485;
+  itemMap[12][6]=0;
 }
 void drawRoomThree() {
   int squareX=characterX/32;
@@ -428,12 +429,12 @@ void drawRoomThree() {
     } else if (squareX==6&&squareY==9) {
       if (hasMenuOpen) {
         //deal with stroke
-        
+
         if (roomThreeClickScore==70) {
-          fill(100,200,100);
+          fill(100, 200, 100);
           text(roomThreeClickScore+"    "+roomThreeReactionTime, 300, 100);
           rect(180, 120, 440, 250);
-          if(millis()-timeSolved>1000){
+          if (millis()-timeSolved>1000) {
             hasMenuOpen=false;
             timeSolved=-1;
             playerMap[6][9]=4;
@@ -460,7 +461,7 @@ void drawRoomThree() {
             mouseBeenPressed=true;
             noFill();
           }
-          if(roomThreeClickScore==70)timeSolved=millis();
+          if (roomThreeClickScore==70)timeSolved=millis();
           println(roomThreeClickScore);
           rect(180, 120, 440, 250);
         }
@@ -1075,6 +1076,11 @@ void moveCharacter() {
       }
     }
   }
+}
+void levelSelection() {
+  background(bg);
+  rect(100, 100, 100, 100);
+  //text("Room One\nIntro")
 }
 void drawColourSquare() {
   for (int i=0; i<256; i++) {
