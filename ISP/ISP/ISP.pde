@@ -3,7 +3,8 @@ int sineWaveT=0;
 PGraphics foreGround;
 int mainMenuBoxes=150;
 PImage bg;
-
+boolean isMouseReleased=false;
+boolean drawMouseBeenPressed=false;
 //character
 int h=0, s=100, b=100;
 int colourSquareX=400, colourSquareY=150;//Moving the colour square
@@ -39,15 +40,16 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
-int onLevel=10;
+int onLevel=8;
 int startSec, startMin, startHr;
-String numToWord[]={"One", "Two", "Three", "Four", "Five"};
+String numToWord[]={"One", "Two", "Three"};
 int secondElasped=second()-startSec;
 int minuteElasped=minute()-startMin;
 int hourElasped=hour()-startHr;
 boolean spaceBeenPressed=false;
 boolean mouseBeenPressed=false;
 int timeSolved=-1;
+int highestLevelReached=8;
 //Room One
 PImage roomOneGrid, roomOneGridPuzzle;
 boolean rOHasMenuOpen=false;
@@ -62,6 +64,7 @@ int roomThreeStackerLayer=8;
 boolean roomThreeButtonOn=false;
 int roomThreeReactionTime=0;
 int roomThreeClickScore=0;
+boolean roomThreeMapButtonOn=false;
 //0 is splash screen
 //1 is main menu
 //2 is play
@@ -91,6 +94,16 @@ void setup() {
   roomTwoCodePuzzle=loadImage("RoomTwoCodePuzzle.png");
 }
 void draw() {
+  if (mousePressed) {
+    drawMouseBeenPressed=true;
+  } else {
+    if (drawMouseBeenPressed) {
+      isMouseReleased=true;
+      drawMouseBeenPressed=false;
+    } else {
+      isMouseReleased=false;
+    }
+  }
   if (currentWindow==0) {
     splashScreen();
     if (currentWindow==1) {
@@ -101,8 +114,6 @@ void draw() {
     if (currentWindow==2) {
       strokeWeight(1);
       size(800, 500);
-    } else if (currentWindow==3) {
-      levelSelection();
     } else if (currentWindow==4) {
       strokeWeight(1);
       background(200);
@@ -124,11 +135,32 @@ void draw() {
       startSec=second();
       startMin=minute();
       startHr=hour();
+    } else if (currentWindow==4) {
+      strokeWeight(1);
+      background(200);
+      stroke(200);
+      fill(200);
+      rect(colourSquareX, colourSquareY, 255, 255);
+      colorMode(HSB);
+      drawColourSquare();
     }
     if (currentWindow==8)setupRoomOne();
     else if (currentWindow==9)setupRoomTwo();
     else if (currentWindow==10)setupRoomThree();
   } else if (currentWindow==3) {
+    levelSelection();
+    if (currentWindow>=8&&currentWindow<=10) {  //Change this if needed
+      resetRoom();
+      background(100);
+      characterX=32;
+      characterY=32;
+      startSec=second();
+      startMin=minute();
+      startHr=hour();
+    }
+    if (currentWindow==8)setupRoomOne();
+    else if (currentWindow==9)setupRoomTwo();
+    else if (currentWindow==10)setupRoomThree();
   } else if (currentWindow==4) {
     colourPicker();
     //This method leaves in RGB
@@ -156,9 +188,10 @@ void draw() {
   } else if (currentWindow==10) {
     roomThree();
   }
-  println(mouseX/32, mouseY/32);
+  println(highestLevelReached);
 }
 void winScreen() {
+
   textSize(80);
   textAlign(CENTER);
   text("Room "+numToWord[onLevel-8]+"\nCompleted!", 400, 100);
@@ -166,18 +199,30 @@ void winScreen() {
   text("Time: "+hourElasped+"h "+minuteElasped+"m "+secondElasped+"s", 400, 250);
   textAlign(LEFT);
   text("Main Menu", 50, 400);
-  text("Next Level", 600, 400);
+  if (onLevel==10)text("Play Again", 600, 400);
+  else text("Next Level", 600, 400);
   noFill();
   strokeWeight(5);
   if (mouseX>=45&&mouseX<=210&&mouseY>=365&&mouseY<=415) {
     rect(45, 365, 165, 50);
-    if (mousePressed) {
+    if (isMouseReleased) {
       currentWindow=1;
-      onLevel++;
+      if (onLevel==10)
+        onLevel=8;
+      else
+        onLevel++;
+      highestLevelReached=max(highestLevelReached, onLevel);
     }
   } else if (mouseX>=595&&mouseX<=745&&mouseY>=365&&mouseY<=415) {
     rect(595, 365, 150, 50);
-    if (mousePressed)currentWindow=++onLevel;
+    if (isMouseReleased) {
+      if (onLevel==10)
+        onLevel=8;
+      else
+        onLevel++;
+      highestLevelReached=max(highestLevelReached, onLevel);
+      currentWindow=onLevel;
+    }
   }
   strokeWeight(1);
 }
@@ -185,6 +230,28 @@ void roomThree() {
   for (int i=13; i<24; i++) {
     for (int j=1; j<12; j++)playerMap[i][j]=6;
   }
+  if (roomThreeMapButtonOn) {
+    playerMap[20][8]=1;
+    playerMap[19][5]=1;
+    playerMap[19][10]=1;
+    playerMap[16][2]=1;
+    playerMap[14][7]=1;
+    playerMap[15][6]=1;
+    playerMap[15][10]=1;
+    playerMap[18][2]=7;
+  } else {
+    playerMap[19][3]=1;
+    playerMap[22][5]=1;
+    playerMap[15][2]=1;
+    playerMap[20][10]=1;
+    playerMap[16][8]=1;
+    playerMap[21][9]=1;
+    playerMap[21][7]=1;
+  }
+  playerMap[17][9]=3;
+  playerMap[20][6]=3;
+  playerMap[14][3]=3;
+  playerMap[18][4]=3;
   drawMap();
   timeElasped();
   moveCharacter();
@@ -216,6 +283,7 @@ void setupRoomThree() {
     if (puzzleBoxY<4)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
   }
   for (int i=0; i<12; i++)playerMap[12][i]=1;
+  playerMap[12][1]=0;
   playerMap[6][3]=8;
   noteMap[6][3]="3";
   playerMap[6][5]=8;
@@ -817,8 +885,13 @@ void guiPopup() {
     }
   } else if (playerMap[squareX][squareY]==3) {
     if (keyPressed&&key==' ') {
-      if (itemMap[squareX][squareY]!=3)
-        //Switch button
+      if (spaceBeenPressed) {
+        roomThreeMapButtonOn=!roomThreeMapButtonOn;
+        spaceBeenPressed=false;
+      }
+      //Switch button
+    } else {
+      spaceBeenPressed=true;
     }
   } else if (playerMap[squareX][squareY]==8) {
     if (keyPressed&&key==' '&&!hasMenuOpen) {
@@ -883,13 +956,12 @@ void playGame() {
       stroke(200, 200, 255);
       fill(200, 200, 255);
       rect(300, 200, 200, 100);
-      if (mousePressed)currentWindow=1;//Mainmenu
-      //TODO change range of mainmenu so that it does not overlap with levels
+      if (isMouseReleased)currentWindow=1;//mainMenu
     } else if (mouseX<=750&&mouseX>=550&&mouseY<=300&&mouseY>=200) {
       stroke(200, 200, 255);
       fill(200, 200, 255);
       rect(550, 200, 200, 100);
-      if (mousePressed) {
+      if (isMouseReleased) {
         currentWindow=onLevel;//Room one
         hasWentToCharacter=true;
       }
@@ -924,6 +996,9 @@ void drawMap() {
         image(lockedBox, 32*i, 32*j);
       } else if (playerMap[i][j]==3) {
         //Switch
+        fill(200);
+        stroke(200);
+        ellipse(32*i+16, 32*j+16, 15, 15);
       } else if (playerMap[i][j]==4||playerMap[i][j]==8) {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
@@ -1082,8 +1157,57 @@ void moveCharacter() {
 }
 void levelSelection() {
   background(bg);
-  rect(100, 100, 100, 100);
-  //text("Room One\nIntro")
+  noFill();
+  stroke(255);
+  strokeWeight(10);
+  rect(125, 100, 150, 150);
+  rect(325, 100, 150, 150);
+  rect(525, 100, 150, 150);
+  rect(300, 350, 200, 75);
+  fill(255);
+  text("Room\nOne", 150, 150);
+  text("Room\nTwo", 350, 150);
+  text("Room\nThree", 550, 150);
+  text("Go Back", 345, 400);
+  if(highestLevelReached<9){
+    fill(100,100);
+    rect(325, 100, 150, 150);
+  }
+  if(highestLevelReached<10){
+    fill(100,100);
+    rect(525, 100, 150, 150);
+  }
+  if (mouseX>=125&&mouseX<=275&&mouseY>=100&&mouseY<=250&&highestLevelReached>=8) {
+    fill(200);
+    stroke(200);
+    rect(125, 100, 150, 150);
+    fill(100);
+    text("Room\nOne", 150, 150);
+    if (isMouseReleased)currentWindow=8;
+  } else if (mouseX>=325&&mouseX<=475&&mouseY>=100&&mouseY<=250&&highestLevelReached>=9) {
+    fill(200);
+    stroke(200);
+    rect(325, 100, 150, 150);
+    fill(100);
+    text("Room\nTwo", 350, 150);
+    if (isMouseReleased)currentWindow=9;
+  } else if (mouseX>=525&&mouseX<=675&&mouseY>=100&&mouseY<=250&&highestLevelReached>=10) {
+    fill(200);
+    stroke(200);
+    rect(525, 100, 150, 150);
+    fill(100);
+    text("Room\nThree", 550, 150);
+    if (isMouseReleased)currentWindow=10;
+  } else if (mouseX>=300&&mouseX<=500&&mouseY>=350&&mouseY<=425) {
+    fill(200);
+    stroke(200);
+    rect(300, 350, 200, 75);
+    fill(100);
+    text("Go Back", 345, 400);
+    if (isMouseReleased)currentWindow=1;
+  }
+
+  strokeWeight(1);
 }
 void drawColourSquare() {
   for (int i=0; i<256; i++) {
@@ -1232,7 +1356,7 @@ void mainMenu() {
     rect(300, 100, 200, 50);
     fill(255-mainMenuBoxes);
     text("Play", 370, 135);
-    if (mousePressed) currentWindow=2;
+    if (isMouseReleased) currentWindow=2;
   } else if (mouseX<=500&&mouseX>=300&&mouseY<=225&&mouseY>=175) {
     if (mainMenuBoxes+3<=255)mainMenuBoxes+=3;
     fill(mainMenuBoxes);
@@ -1240,7 +1364,7 @@ void mainMenu() {
     rect(300, 175, 200, 50);
     fill(255-mainMenuBoxes);
     text("Levels", 355, 210);
-    if (mousePressed) currentWindow=3;
+    if (isMouseReleased) currentWindow=3;
   } else if (mouseX<=500&&mouseX>=300&&mouseY<=300&&mouseY>=250) {
     if (mainMenuBoxes+3<=255)mainMenuBoxes+=3;
     fill(mainMenuBoxes);
@@ -1248,7 +1372,7 @@ void mainMenu() {
     rect(300, 250, 200, 50);
     fill(255-mainMenuBoxes);
     text("Character", 335, 285);
-    if (mousePressed) currentWindow=4;
+    if (isMouseReleased) currentWindow=4;
   } else if (mouseX<=500&&mouseX>=300&&mouseY<=375&&mouseY>=325) {
     if (mainMenuBoxes+3<=255)mainMenuBoxes+=3;
     fill(mainMenuBoxes);
@@ -1256,7 +1380,7 @@ void mainMenu() {
     rect(300, 325, 200, 50);
     fill(255-mainMenuBoxes);
     text("Instructions", 320, 360);
-    if (mousePressed) currentWindow=5;
+    if (isMouseReleased) currentWindow=5;
   } else if (mouseX<=500&&mouseX>=300&&mouseY<=450&&mouseY>=400) {
     if (mainMenuBoxes+3<=255)mainMenuBoxes+=3;
     fill(mainMenuBoxes);
@@ -1264,7 +1388,7 @@ void mainMenu() {
     rect(300, 400, 200, 50);
     fill(255-mainMenuBoxes);
     text("Quit", 370, 435);
-    if (mousePressed) currentWindow=6;
+    if (isMouseReleased) currentWindow=6;
   } else {
     mainMenuBoxes=100;
   }
@@ -1315,7 +1439,7 @@ void splashScreen() {
   translate(lampX, lampY);
   rotate(radians(lightAngle-90));
   image(lantern, -16, -17, 32, 34);
-  if (mousePressed) {
+  if (isMouseReleased) {
     if (mouseX<=750&&mouseX>=600&mouseY<=75&&mouseY>=25) {
       currentWindow=1;
     }
