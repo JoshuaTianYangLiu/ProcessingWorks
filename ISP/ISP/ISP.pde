@@ -165,6 +165,7 @@ void draw() {
     colourPicker();
     //This method leaves in RGB
   } else if (currentWindow==5) {
+    instructions();
   } else if (currentWindow==6) {
   } else if (currentWindow==7) {
     background(100, 200, 100);
@@ -189,6 +190,10 @@ void draw() {
     roomThree();
   }
   println(highestLevelReached);
+}
+void instructions(){
+  background(bg);
+  
 }
 void winScreen() {
 
@@ -1020,7 +1025,7 @@ void drawMap() {
   if (mouseX>=340&&mouseX<=500&&mouseY>=430&&mouseY<=480) {
     fill(150, 150, 250);
     stroke(150, 150, 250);
-    if (mousePressed&&!hasMenuOpen) {
+    if (isMouseReleased) {
       currentWindow=2;
       delay(100);
     }
@@ -1032,7 +1037,7 @@ void drawMap() {
   if (mouseX>=540&&mouseX<=770&&mouseY>=430&&mouseY<=480) {
     fill(150, 150, 250);
     stroke(150, 150, 250);
-    if (mousePressed)currentWindow=1;
+    if (isMouseReleased)currentWindow=1;
   } else {
     fill(100, 100, 200);
     stroke(100, 100, 200);
