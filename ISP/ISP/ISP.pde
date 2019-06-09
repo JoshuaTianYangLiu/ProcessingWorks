@@ -373,11 +373,11 @@ void drawRoomThree() {
         noStroke();
         textSize(28);
         fill(0);
-        text("<=250ms", 150, 250);
+        text("Click\n<=250ms", 150, 250);
         if (roomThreeReactionTime<=250&&roomThreeReactionTime!=0&&!roomThreeButtonOn) {
           fill(100, 200, 100);
           ellipse(400, 250, 250, 250);
-          text(roomThreeReactionTime, 375, 100);
+          text(roomThreeReactionTime+" ms", 375, 100);
           if (millis()-timeSolved>2000) {
             hasMenuOpen=false;
             timeSolved=-1;
@@ -385,7 +385,7 @@ void drawRoomThree() {
           }
         } else if (roomThreeButtonOn) {
           roomThreeReactionTime=millis()-timeSolved;
-          text(roomThreeReactionTime, 375, 100);
+          text(roomThreeReactionTime+" ms", 375, 100);
           if (roomThreeReactionTime>1000) {
             roomThreeButtonOn=false;
             timeSolved=millis();
@@ -401,7 +401,7 @@ void drawRoomThree() {
           if (!keyPressed||timeSolved!=-1) {
             if (timeSolved==-1)timeSolved=millis();
 
-            if (millis()-timeSolved>3000) {
+            if (millis()-timeSolved>3000+random(0,2)) {
               roomThreeButtonOn=true;
               timeSolved=millis();
             }
@@ -413,27 +413,24 @@ void drawRoomThree() {
               spaceBeenPressed=false;
             }
             ellipse(400, 250, 250, 250);
-            fill(0);
-            if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)text(roomThreeReactionTime, 375, 100);
-            else text("000", 375, 100);
           } else {
             fill(200, 100, 100);
             ellipse(400, 250, 250, 250);
             fill(0);
-            if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)text(roomThreeReactionTime, 375, 100);
-            else text("000", 375, 100);
           }
+          fill(0);
+          if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)text(roomThreeReactionTime+" ms", 375, 100);
+          else text("000 ms", 375, 100);
         }
       }
     } else if (squareX==6&&squareY==9) {
       if (hasMenuOpen) {
-        //deal with stroke
-        
-        if (roomThreeClickScore==70) {
-          fill(100,200,100);
-          text(roomThreeClickScore+"    "+roomThreeReactionTime, 300, 100);
+        stroke(0);
+        if (roomThreeClickScore==90) {
+          fill(100, 200, 100);
+          text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
           rect(180, 120, 440, 250);
-          if(millis()-timeSolved>1000){
+          if (millis()-timeSolved>1000) {
             hasMenuOpen=false;
             timeSolved=-1;
             playerMap[6][9]=4;
@@ -445,8 +442,9 @@ void drawRoomThree() {
             roomThreeClickScore=0;
           }
           fill(0);
-          if (timeSolved==-1)text(roomThreeClickScore+"    000", 300, 100);
-          else text(roomThreeClickScore+"    "+roomThreeReactionTime, 300, 100);
+          if (timeSolved==-1)text(roomThreeClickScore+" Clicks    0.000 Sec", 200, 100);
+          else text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
+
           if (mousePressed) {
 
             if (mouseBeenPressed&&timeSolved!=-1) {
@@ -458,9 +456,12 @@ void drawRoomThree() {
             fill(230);
           } else {
             mouseBeenPressed=true;
+            if (timeSolved==-1) {
+              text("Click 90 times in 10 seconds", 200, 250);
+            }
             noFill();
           }
-          if(roomThreeClickScore==70)timeSolved=millis();
+          if (roomThreeClickScore==90)timeSolved=millis();
           println(roomThreeClickScore);
           rect(180, 120, 440, 250);
         }
@@ -650,6 +651,8 @@ void winPlatform() {
     currentWindow=7;
   }
 }
+
+//
 void timeElasped() {
   secondElasped=second()-startSec;
   minuteElasped=minute()-startMin;
@@ -666,12 +669,14 @@ void timeElasped() {
     hourElasped+=24;
   }
   String outputLine="";
-  if (hourElasped<10)outputLine+="0"+hourElasped+":";
+  if (hourElasped<10)
+    outputLine+="0"+hourElasped+":";
   else outputLine+=hourElasped+":";
   if (minuteElasped<10)outputLine+="0"+minuteElasped+":";
   else outputLine+=minuteElasped+":";
   if (secondElasped<10)outputLine+="0"+secondElasped;
   else outputLine+=secondElasped;
+  
   text("Time "+outputLine, 20, 470);
 }
 void guiPopup() {
@@ -12673,4 +12678,4 @@ void characterLeftTwo() {
   point(23+characterX, 12+characterY);
 }
 
-//Now, you might wonder what takes thousands of line. Its the sprites, they take up about 11k lines :>
+//Now, you might wonder what takes thousands of line. It's the sprites, they take up about 11k lines :>
