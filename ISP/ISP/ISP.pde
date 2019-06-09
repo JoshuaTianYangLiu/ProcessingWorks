@@ -24,7 +24,7 @@ int moveCharacterFrame=0;
 int moveCharacterMoves=0;
 int characterGridX=0;
 int characterGridY=0;
-PImage lockedBox, note, paperNote, lockedWall, iceFloor;
+PImage lockedBox, note, paperNote, lockedWall, iceFloor, miniGame;
 String noteMap[][]=new String[25][13];
 int lockPassKey[][]=new int[25][13];
 int finalValue[]=new int[4];
@@ -86,7 +86,7 @@ void setup() {
   paperNote=loadImage("NotePopup.png");
   lockedWall=loadImage("LockedEntry.png");
   iceFloor=loadImage("IceFloor.png");
-
+  miniGame=loadImage("MinigamePuzzle.png");
   roomOneGrid=loadImage("RoomOnePuzzleGrid.png");
   roomOneGridPuzzle=loadImage("RoomOnePuzzleGridPuzzle.png");
   roomTwoShape=loadImage("RoomTwoShapes.png");
@@ -167,6 +167,7 @@ void draw() {
   } else if (currentWindow==5) {
     instructions();
   } else if (currentWindow==6) {
+    goodBye();
   } else if (currentWindow==7) {
     background(100, 200, 100);
     winScreen();
@@ -191,9 +192,68 @@ void draw() {
   }
   println(highestLevelReached);
 }
-void instructions(){
+void goodBye(){
   background(bg);
+  fill(255);
+  textSize(30);
+  textAlign(CENTER);
+  text("Thank you for playing my game\nEscape Room\nMade by Joshua Liu",400,100);
+  fill(200);
+  text("Press any key to close game.",400,450);
+  if(keyPressed)exit();
+}
+void instructions() {
+  background(bg);
+  stroke(255);
+  fill(255);
+  text("Controls",50,82);
+  image(lockedBox,50,150);
+  image(note,50,200);
+  image(lockedWall,50,250);
+  image(iceFloor,50,300);
+  image(miniGame,50,350);
+  text("Main Menu",50,450);
+  line(50,122,150,122);
+  fill(100,200,100);
+  noStroke();
+  rect(100,250,32,32);
+  fill(255);
+  stroke(255);
+  noFill();
+  rect(300,50,450,400);
   
+  if(mouseX>=45&&mouseX<=205&&mouseY>=420&&mouseY<=455){  //Main menu
+    fill(255);
+    rect(45,420,160,35);
+    fill(0);
+    text("Main Menu",50,450);
+    fill(255);
+    if(isMouseReleased)currentWindow=1;
+  }
+  if(mouseX>=45&&mouseX<=170&&mouseY>=55&&mouseY<=90){  //Controls
+    rect(45,55,125,35);
+    text("You can use either WASD or\nARROW KEYS to move around\nyour character.\n\n\nUse the spacebar to interact\nwith items.",325,100);
+  }else if(mouseX>=50&&mouseX<=82&&mouseY>=150&&mouseY<=182){  //Locked Box
+    rect(50,150,32,32);
+    text("Behind this 4 digit locked box\nlies something behind it\n\nTo move around the dials,\nclick and drag the mouse.",325,100);
+  }else if(mouseX>=50&&mouseX<=82&&mouseY>=200&&mouseY<=232){  //Note Paper
+    rect(50,200,32,32);
+    text("These pieces of paper\nmysteriously left by the last\nroam these rooms could be\nyour escape.\n\nRead them carefully.",325,100);
+  }else if(mouseX>=50&&mouseX<=82&&mouseY>=250&&mouseY<=282){  //Locked Wall
+    rect(50,250,32,32);
+    text("Similar to the locked\nbox, these wall combination\nlocks needs a 4 digit code\nin order to unlock it and move.",325,100);
+  }else if(mouseX>=50&&mouseX<=82&&mouseY>=300&&mouseY<=332){  //Ice Floor
+    rect(50,300,32,32);
+    text("This slippery floor\nis apart of every room.\n\nYour player can't stop moving\nuntil it hits a wall.",325,100);
+  }else if(mouseX>=50&&mouseX<=82&&mouseY>=350&&mouseY<=382){  //Minigame
+    rect(50,350,32,32);
+    text("These icons represent a game\nneeded to be completed\nbefore getting your next\nhint.\n\nTo interact, you can use the \nmouse, the spacebar or\nboth.",325,100);
+  }else if(mouseX>=100&&mouseX<=132&&mouseY>=250&&mouseY<=282){  //Win Pad
+    rect(100,250,32,32);
+    text("This platform is how you will\nescape each room,\nstand on it and you're out!",325,100);
+  }else{
+    text("Welcome to the instruction\nmenu.\n\nHover over any of the icons to\nget a description of said item.\n\n\nClick on \"Main Menu \" to go\nback",325,100);
+  }
 }
 void winScreen() {
 
@@ -1004,7 +1064,7 @@ void drawMap() {
         fill(200);
         stroke(200);
         ellipse(32*i+16, 32*j+16, 15, 15);
-      } else if (playerMap[i][j]==4||playerMap[i][j]==8) {
+      } else if (playerMap[i][j]==4) {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
         image(lockedWall, 32*i, 32*j);
@@ -1017,6 +1077,8 @@ void drawMap() {
         fill(200);
         rect(32*i, 32*j, 31, 31);
         image(iceFloor, 32*i, 32*j);
+      } else if (playerMap[i][j]==8) {
+        image(miniGame, 32*i, 32*j);
       }
     }
   }
@@ -1174,12 +1236,12 @@ void levelSelection() {
   text("Room\nTwo", 350, 150);
   text("Room\nThree", 550, 150);
   text("Go Back", 345, 400);
-  if(highestLevelReached<9){
-    fill(100,100);
+  if (highestLevelReached<9) {
+    fill(100, 100);
     rect(325, 100, 150, 150);
   }
-  if(highestLevelReached<10){
-    fill(100,100);
+  if (highestLevelReached<10) {
+    fill(100, 100);
     rect(525, 100, 150, 150);
   }
   if (mouseX>=125&&mouseX<=275&&mouseY>=100&&mouseY<=250&&highestLevelReached>=8) {
