@@ -23,7 +23,7 @@ int moveCharacterFrame=0;
 int moveCharacterMoves=0;
 int characterGridX=0;
 int characterGridY=0;
-PImage lockedBox, unlockedBox, note, paperNote, lockedWall, iceFloor;
+PImage lockedBox, note, paperNote, lockedWall, iceFloor;
 String noteMap[][]=new String[25][13];
 int lockPassKey[][]=new int[25][13];
 int finalValue[]=new int[4];
@@ -39,7 +39,7 @@ int itemMap[][]=new int[25][13];
 boolean hasMenuOpen=false;
 String noteMessage;
 boolean hasUnlocked;
-int onLevel=8;
+int onLevel=10;
 int startSec, startMin, startHr;
 String numToWord[]={"One", "Two", "Three", "Four", "Five"};
 int secondElasped=second()-startSec;
@@ -79,7 +79,6 @@ void setup() {
   foreGround=createGraphics(800, 500);
   bg = loadImage("splashScreenBG.jpg");
   lockedBox=loadImage("LockedBox.png");
-  unlockedBox=loadImage("UnlockedBox.png");
   note = loadImage("Note.png");
   paperNote=loadImage("NotePopup.png");
   lockedWall=loadImage("LockedEntry.png");
@@ -402,7 +401,7 @@ void drawRoomThree() {
           if (!keyPressed||timeSolved!=-1) {
             if (timeSolved==-1)timeSolved=millis();
 
-            if (millis()-timeSolved>3000+random(0,2)) {
+            if (millis()-timeSolved>3000+random(0, 2)) {
               roomThreeButtonOn=true;
               timeSolved=millis();
             }
@@ -426,18 +425,11 @@ void drawRoomThree() {
       }
     } else if (squareX==6&&squareY==9) {
       if (hasMenuOpen) {
-<<<<<<< HEAD
         stroke(0);
         if (roomThreeClickScore==90) {
           fill(100, 200, 100);
           text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
-=======
-        //deal with stroke
-
-        if (roomThreeClickScore==70) {
-          fill(100, 200, 100);
-          text(roomThreeClickScore+"    "+roomThreeReactionTime, 300, 100);
->>>>>>> 4462bb5ecf13af1c8e4dcbf6bbec1d9047c01eea
+          //deal with stroke
           rect(180, 120, 440, 250);
           if (millis()-timeSolved>1000) {
             hasMenuOpen=false;
@@ -470,11 +462,7 @@ void drawRoomThree() {
             }
             noFill();
           }
-<<<<<<< HEAD
           if (roomThreeClickScore==90)timeSolved=millis();
-=======
-          if (roomThreeClickScore==70)timeSolved=millis();
->>>>>>> 4462bb5ecf13af1c8e4dcbf6bbec1d9047c01eea
           println(roomThreeClickScore);
           rect(180, 120, 440, 250);
         }
@@ -689,7 +677,7 @@ void timeElasped() {
   else outputLine+=minuteElasped+":";
   if (secondElasped<10)outputLine+="0"+secondElasped;
   else outputLine+=secondElasped;
-  
+
   text("Time "+outputLine, 20, 470);
 }
 void guiPopup() {
@@ -830,9 +818,7 @@ void guiPopup() {
   } else if (playerMap[squareX][squareY]==3) {
     if (keyPressed&&key==' ') {
       if (itemMap[squareX][squareY]!=3)
-        playerMap[squareX][squareY]=itemMap[squareX][squareY];
-    } else {
-      playerMap[squareX][squareY]=0;
+        //Switch button
     }
   } else if (playerMap[squareX][squareY]==8) {
     if (keyPressed&&key==' '&&!hasMenuOpen) {
@@ -937,7 +923,7 @@ void drawMap() {
       } else if (playerMap[i][j]==2) {
         image(lockedBox, 32*i, 32*j);
       } else if (playerMap[i][j]==3) {
-        image(unlockedBox, 32*i, 32*j);
+        //Switch
       } else if (playerMap[i][j]==4||playerMap[i][j]==8) {
         image(note, 32*i, 32*j);
       } else if (playerMap[i][j]==5) {
