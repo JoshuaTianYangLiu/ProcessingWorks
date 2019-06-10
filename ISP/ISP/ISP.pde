@@ -1,87 +1,105 @@
-int currentWindow=1;
-int sineWaveT=0;
-PGraphics foreGround;
-int mainMenuBoxes=150;
-PImage bg;
-boolean isMouseReleased=false;
-boolean drawMouseBeenPressed=false;
-//character
-int h=0, s=100, b=100;
+//Joshua Liu
+//May 24, 2019
+//Mr.Rosen
+//This program is an escape room game where the user controls a player and the player needs to solve puzzles and beat challenges inorder to escape the rooms and win the game
+
+
+
+
+int currentWindow=0;  //To keep track of which screen to display
+int sineWaveT=0;  //The sine wave time for the swinging lightbulb
+//https://processing.org/reference/PGraphics.html
+PGraphics foreGround;  //Responsible for the splashscreen shading effect
+int mainMenuBoxes=150;  //Creating the shading effect for the main menu boxes
+PImage bg;  //Background image
+boolean isMouseReleased=false;  //Used as a substitute to mousePressed to prevent users quickly going through each screen
+boolean drawMouseBeenPressed=false;  //To know when the mouse has been released and when it has been released for too long
+int h=0, s=100, b=100;  //Colour calculations for colour picker
 int colourSquareX=400, colourSquareY=150;//Moving the colour square
 int characterX=0, characterY=0;  //Character position
-color characterHairOne=color(152, 104, 88);
+color characterHairOne=color(152, 104, 88);  //Remembers the colours of the character's hair and pants colours that the user chose
 color characterHairTwo=color(104, 72, 56);
 color characterPantsOne=color(99, 173, 242);
 color characterPantsTwo=color(72, 104, 176);
 color characterPantsThree=color(56, 104, 176);
-boolean chosenHair=true;
-boolean hasWentToCharacter=false;
+boolean chosenHair=true;  //To alternate between hair and pants choice
+boolean hasWentToCharacter=false;  //To allow user a second chance to customize character
 //Play
-int playerMap[][]=new int[25][13];
-boolean hasControl=true;
-char lastMove='d';
-int moveCharacterFrame=0;
-int moveCharacterMoves=0;
-int characterGridX=0;
-int characterGridY=0;
-PImage lockedBox, note, paperNote, lockedWall, iceFloor, miniGame;
-String noteMap[][]=new String[25][13];
-int lockPassKey[][]=new int[25][13];
-int finalValue[]=new int[4];
-int curValue[] = new int[4];
-int scrollX[] = new int[4];
-int distance[] = new int[4];
-int colourSection=0;
-int shackleY=0;
-int numComb=0;
-int playerBar[]=new int[4];
-int numOfItems=0;
-int itemMap[][]=new int[25][13];
-boolean hasMenuOpen=false;
-String noteMessage;
-boolean hasUnlocked;
-int onLevel=8;
-int startSec, startMin, startHr;
-String numToWord[]={"One", "Two", "Three"};
-int secondElasped=second()-startSec;
+int playerMap[][]=new int[25][13];  //To remember what items are on the map currently
+boolean hasControl=true;  //To allow smooth transition going fro square to square without the user breaking the program
+char lastMove='d';  //For player facing
+int moveCharacterFrame=0;  //The speed at which the player moves in how many frames
+int moveCharacterMoves=0;  //The speed of the player alternates between left and right foot
+int characterGridX=0;  //The current x and y coord of the player
+int characterGridY=0;  
+PImage lockedBox, note, paperNote, lockedWall, iceFloor, miniGame;  //Images of items that the user will interact with
+String noteMap[][]=new String[25][13];  //To easily assign messages to notes for each room
+int lockPassKey[][]=new int[25][13];  //The combination number of locks on the player map
+int finalValue[]=new int[4];  //The value of the combination lock prior to moving it around
+int curValue[] = new int[4];  //The current value of the combination lock while moving it around
+int scrollX[] = new int[4];  //The y position of the mouse prior to moving the combination lock
+int distance[] = new int[4];  //The distance the dial has traveled while moving around
+int colourSection=0;  //For the shadowing effect
+int shackleY=0;  //Unlocking animation effect
+int numComb=0;  //The value of the combination on screen
+boolean hasMenuOpen=false;  //To know if a screen should be displayed
+String noteMessage;  //The output of the note screen
+boolean hasUnlocked;  //To know if the player has unlocked the lock and to play the opening animation
+int onLevel=8;  //Currently the level that the player has gotten to
+int startSec, startMin, startHr;  //Timer values for each level
+String numToWord[]={"One", "Two", "Three"};  //A number to word converter for win screen
+int secondElasped=second()-startSec;  //Time elasped
 int minuteElasped=minute()-startMin;
 int hourElasped=hour()-startHr;
-boolean spaceBeenPressed=false;
-boolean mouseBeenPressed=false;
-int timeSolved=-1;
-int highestLevelReached=8;
+boolean spaceBeenPressed=false;  //To add the space key as a way to toggle a popup
+boolean mouseBeenPressed=false;  //Used for mouse released in the minigames
+int timeSolved=-1;  //Time elasped for minigames
+int highestLevelReached=10;  //Highest room achieved, used in level selection to know which are unlocked
 //Room One
-PImage roomOneGrid, roomOneGridPuzzle;
-boolean rOHasMenuOpen=false;
+PImage roomOneGrid, roomOneGridPuzzle;  //Images for a puzzle in room one
 //Room Two
-PImage roomTwoShape, roomTwoColourPuzzle, roomTwoCodePuzzle;
+PImage roomTwoShape, roomTwoColourPuzzle, roomTwoCodePuzzle;  //Images for puzzles in room two
 //Room Three
-boolean roomThreeLightPuzzle[][]=new boolean[7][5];
-boolean roomThreeStacker[][]=new boolean[6][8];
-int roomThreeStackerPos=0;
-boolean roomThreeIsGoingRight=true;
-int roomThreeStackerLayer=8;
-boolean roomThreeButtonOn=false;
-int roomThreeReactionTime=0;
-int roomThreeClickScore=0;
-boolean roomThreeMapButtonOn=false;
-//0 is splash screen
-//1 is main menu
-//2 is play
-//3 is levels
-//4 is character
-//5 is instructions
-//6 is quit
-//7 is win screen
-//8 is roomOne
-//9 is roomTwo
-//https://www.youtube.com/watch?v=j-ZLDEnhT3Q 12:37
+boolean roomThreeLightPuzzle[][]=new boolean[7][5];  //To know which lights are on and off in the light puzzle game
+boolean roomThreeStacker[][]=new boolean[6][8];  //Stacker to know where the blocks are
+int roomThreeStackerPos=0;  //For the position of the top stacker block
+boolean roomThreeIsGoingRight=true;  //To know when to go left and right for the bouncing off the wall effect
+int roomThreeStackerLayer=8;  //To know which layer the next block should stack on
+boolean roomThreeButtonOn=false;  //Toggle when the user can click the button
+int roomThreeReactionTime=0;  //Elasped time when clicking the button
+int roomThreeClickScore=0;  //The number of clicks achieved to far
+boolean roomThreeMapButtonOn=false;  //To toggle between each of the two states of walls for the final puzzle
+//Screen state number to screen map. Numbers will be assigned to currentWindow
+/*
+  0 is splash screen
+ 1 is main menu
+ 2 is play
+ 3 is levels
+ 4 is character
+ 5 is instructions
+ 6 is quit
+ 7 is win screen
+ 8 is roomOne
+ 9 is roomTwo
+ */
+//PlayerMap number to item map. Numbers will be assigned to playerMap[][]
+/*
+0 floor
+ 1 is wall
+ 2 is locked box
+ 3 is toggleable buttons
+ 4 is note
+ 5 is locked wall
+ 6 is ice floor
+ 7 is win platform
+ 8 is minigame
+ */
 void setup() {
   size(800, 500);
   smooth();
+  //To load all the images
   foreGround=createGraphics(800, 500);
   bg = loadImage("splashScreenBG.jpg");
-  lockedBox=loadImage("LockedBox.png");
   note = loadImage("Note.png");
   paperNote=loadImage("NotePopup.png");
   lockedWall=loadImage("LockedEntry.png");
@@ -94,6 +112,7 @@ void setup() {
   roomTwoCodePuzzle=loadImage("RoomTwoCodePuzzle.png");
 }
 void draw() {
+  //The substitute for mousePressed. This stops the going-through-multiple-screens bug
   if (mousePressed) {
     drawMouseBeenPressed=true;
   } else {
@@ -104,17 +123,18 @@ void draw() {
       isMouseReleased=false;
     }
   }
-  if (currentWindow==0) {
+
+  //Determine which screen to draw
+  if (currentWindow==0) {  //splashScreen
     splashScreen();
-    if (currentWindow==1) {
-      //setup code for mainMenu
-    }
-  } else if (currentWindow==1) {
+  } else if (currentWindow==1) {  //mainMenu
     mainMenu();
-    if (currentWindow==2) {
+
+    //Sort of a setup for the next screen
+    if (currentWindow==2) {  //playGame
       strokeWeight(1);
       size(800, 500);
-    } else if (currentWindow==4) {
+    } else if (currentWindow==4) {  //colourPicker
       strokeWeight(1);
       background(200);
       stroke(200);
@@ -122,12 +142,10 @@ void draw() {
       rect(colourSquareX, colourSquareY, 255, 255);
       colorMode(HSB);
       drawColourSquare();
-    } else if (currentWindow==5) {
-    } else if (currentWindow==6) {
     }
-  } else if (currentWindow==2) {
+  } else if (currentWindow==2) {  //playGame
     playGame();
-    if (currentWindow>=8&&currentWindow<=10) {  //Change this if needed
+    if (currentWindow>=8&&currentWindow<=10) {  //A general reset for all rooms
       resetRoom();
       background(100);
       characterX=32;
@@ -135,21 +153,18 @@ void draw() {
       startSec=second();
       startMin=minute();
       startHr=hour();
-    } else if (currentWindow==4) {
-      strokeWeight(1);
-      background(200);
-      stroke(200);
-      fill(200);
-      rect(colourSquareX, colourSquareY, 255, 255);
-      colorMode(HSB);
-      drawColourSquare();
     }
-    if (currentWindow==8)setupRoomOne();
-    else if (currentWindow==9)setupRoomTwo();
-    else if (currentWindow==10)setupRoomThree();
-  } else if (currentWindow==3) {
+
+    //Setup code if player went back to mainmenu and pressed play again
+    if (currentWindow==8)
+      setupRoomOne();
+    else if (currentWindow==9)
+      setupRoomTwo();
+    else if (currentWindow==10)
+      setupRoomThree();
+  } else if (currentWindow==3) {  //levelSelection
     levelSelection();
-    if (currentWindow>=8&&currentWindow<=10) {  //Change this if needed
+    if (currentWindow>=8&&currentWindow<=10) {  //general reset for all rooms
       resetRoom();
       background(100);
       characterX=32;
@@ -157,21 +172,24 @@ void draw() {
       startSec=second();
       startMin=minute();
       startHr=hour();
+      hasWentToCharacter=true;
     }
-    if (currentWindow==8)setupRoomOne();
-    else if (currentWindow==9)setupRoomTwo();
-    else if (currentWindow==10)setupRoomThree();
-  } else if (currentWindow==4) {
+    if (currentWindow==8)
+      setupRoomOne();
+    else if (currentWindow==9)
+      setupRoomTwo();
+    else if (currentWindow==10)
+      setupRoomThree();
+  } else if (currentWindow==4) {  //colourPicker
     colourPicker();
-    //This method leaves in RGB
-  } else if (currentWindow==5) {
+  } else if (currentWindow==5) {  //instructions
     instructions();
-  } else if (currentWindow==6) {
+  } else if (currentWindow==6) {  //exit game
     goodBye();
-  } else if (currentWindow==7) {
+  } else if (currentWindow==7) {  //winscreen
     background(100, 200, 100);
     winScreen();
-    if (currentWindow>=8&&currentWindow<=10) {  //Change this if needed
+    if (currentWindow>=8&&currentWindow<=10) {  //general reset
       resetRoom();
       background(100);
       characterX=32;
@@ -180,1243 +198,93 @@ void draw() {
       startMin=minute();
       startHr=hour();
     }
-    if (currentWindow==8)setupRoomOne();
-    else if (currentWindow==9)setupRoomTwo();
-    else if (currentWindow==10)setupRoomThree();
-  } else if (currentWindow==8) {
+    if (currentWindow==8)
+      setupRoomOne();
+    else if (currentWindow==9)
+      setupRoomTwo();
+    else if (currentWindow==10)
+      setupRoomThree();
+  } else if (currentWindow==8) {  //room one
     roomOne();
-  } else if (currentWindow==9) {
+  } else if (currentWindow==9) {  //room two
     roomTwo();
-  } else if (currentWindow==10) {
+  } else if (currentWindow==10) {  //room three
     roomThree();
   }
-  println(highestLevelReached);
 }
-void goodBye(){
-  background(bg);
-  fill(255);
-  textSize(30);
-  textAlign(CENTER);
-  text("Thank you for playing my game\nEscape Room\nMade by Joshua Liu",400,100);
-  fill(200);
-  text("Press any key to close game.",400,450);
-  if(keyPressed)exit();
-}
-void instructions() {
-  background(bg);
+void splashScreen() {  //A lightbuld swinging in a dark room, with only your mouse and light bulb illumating the things around you
+
+  float lightAngle=30*sin(radians(sineWaveT))+90;  //The angle of the light bulb
+  sineWaveT+=3;
+  float lampX=200*cos(radians(lightAngle))+400, lampY=200*sin(radians(lightAngle)); //Calculating the x and y values of where the lightbulb would be
+  textSize(50);
+  PFont font = loadFont("YuGothicUI-Bold-48.vlw");
+  PImage lantern=loadImage("lantern.png");
+  foreGround.beginDraw();      //Drawing the splash screen
+  foreGround.smooth();
+  foreGround.background(bg);
+  foreGround.stroke(255);
+  foreGround.fill(255);
+  foreGround.textFont(font);
+  foreGround.text("Josh's", 50, 50);
+  foreGround.text("Escape", 150, 100);
+  foreGround.text("Room", 250, 150);
+  foreGround.text("Click \"Play\" to continue", 150, 250);
+  foreGround.textSize(24);
+  foreGround.text("Good Luck, Have Fun!", 50, 450);
+  foreGround.stroke(100);
+  if (mouseX<=750&&mouseX>=600&mouseY<=75&&mouseY>=25) foreGround.fill(100, 200, 100);  //If hovering over the play button
+  foreGround.rect(600, 25, 150, 50);
+  foreGround.fill(100);
+  foreGround.textSize(48);
+  foreGround.text("Play", 625, 63);
+  foreGround.endDraw();
+  foreGround.loadPixels();
+  ////https://www.youtube.com/watch?v=j-ZLDEnhT3Q
+  for (int i=0; i<800; i++) {
+    for (int j=0; j<500; j++) {
+      int loc=i+j*800;
+      float r=red(foreGround.pixels[loc]);  //This creates the lighting effect, the way I got two sources of light to work at once is I found the min distance
+      float g=green(foreGround.pixels[loc]);  //between the lightbulb and the mouse
+      float b=blue(foreGround.pixels[loc]);
+      float d = min(dist(lampX, lampY, i, j), dist(mouseX, mouseY, i, j));
+      float f=map(d, 0, 100, 1.5, 0);
+      foreGround.pixels[loc]=color(r*f, g*f, b*f);
+    }
+  }
+  image(foreGround, 0, 0);
   stroke(255);
-  fill(255);
-  text("Controls",50,82);
-  image(lockedBox,50,150);
-  image(note,50,200);
-  image(lockedWall,50,250);
-  image(iceFloor,50,300);
-  image(miniGame,50,350);
-  text("Main Menu",50,450);
-  line(50,122,150,122);
-  fill(100,200,100);
-  noStroke();
-  rect(100,250,32,32);
-  fill(255);
-  stroke(255);
-  noFill();
-  rect(300,50,450,400);
-  
-  if(mouseX>=45&&mouseX<=205&&mouseY>=420&&mouseY<=455){  //Main menu
-    fill(255);
-    rect(45,420,160,35);
-    fill(0);
-    text("Main Menu",50,450);
-    fill(255);
-    if(isMouseReleased)currentWindow=1;
-  }
-  if(mouseX>=45&&mouseX<=170&&mouseY>=55&&mouseY<=90){  //Controls
-    rect(45,55,125,35);
-    text("You can use either WASD or\nARROW KEYS to move around\nyour character.\n\n\nUse the spacebar to interact\nwith items.",325,100);
-  }else if(mouseX>=50&&mouseX<=82&&mouseY>=150&&mouseY<=182){  //Locked Box
-    rect(50,150,32,32);
-    text("Behind this 4 digit locked box\nlies something behind it\n\nTo move around the dials,\nclick and drag the mouse.",325,100);
-  }else if(mouseX>=50&&mouseX<=82&&mouseY>=200&&mouseY<=232){  //Note Paper
-    rect(50,200,32,32);
-    text("These pieces of paper\nmysteriously left by the last\nroam these rooms could be\nyour escape.\n\nRead them carefully.",325,100);
-  }else if(mouseX>=50&&mouseX<=82&&mouseY>=250&&mouseY<=282){  //Locked Wall
-    rect(50,250,32,32);
-    text("Similar to the locked\nbox, these wall combination\nlocks needs a 4 digit code\nin order to unlock it and move.",325,100);
-  }else if(mouseX>=50&&mouseX<=82&&mouseY>=300&&mouseY<=332){  //Ice Floor
-    rect(50,300,32,32);
-    text("This slippery floor\nis apart of every room.\n\nYour player can't stop moving\nuntil it hits a wall.",325,100);
-  }else if(mouseX>=50&&mouseX<=82&&mouseY>=350&&mouseY<=382){  //Minigame
-    rect(50,350,32,32);
-    text("These icons represent a game\nneeded to be completed\nbefore getting your next\nhint.\n\nTo interact, you can use the \nmouse, the spacebar or\nboth.",325,100);
-  }else if(mouseX>=100&&mouseX<=132&&mouseY>=250&&mouseY<=282){  //Win Pad
-    rect(100,250,32,32);
-    text("This platform is how you will\nescape each room,\nstand on it and you're out!",325,100);
-  }else{
-    text("Welcome to the instruction\nmenu.\n\nHover over any of the icons to\nget a description of said item.\n\n\nClick on \"Main Menu \" to go\nback",325,100);
-  }
-}
-void winScreen() {
-
-  textSize(80);
-  textAlign(CENTER);
-  text("Room "+numToWord[onLevel-8]+"\nCompleted!", 400, 100);
-  textSize(30);
-  text("Time: "+hourElasped+"h "+minuteElasped+"m "+secondElasped+"s", 400, 250);
-  textAlign(LEFT);
-  text("Main Menu", 50, 400);
-  if (onLevel==10)text("Play Again", 600, 400);
-  else text("Next Level", 600, 400);
-  noFill();
-  strokeWeight(5);
-  if (mouseX>=45&&mouseX<=210&&mouseY>=365&&mouseY<=415) {
-    rect(45, 365, 165, 50);
-    if (isMouseReleased) {
-      currentWindow=1;
-      if (onLevel==10)
-        onLevel=8;
-      else
-        onLevel++;
-      highestLevelReached=max(highestLevelReached, onLevel);
-    }
-  } else if (mouseX>=595&&mouseX<=745&&mouseY>=365&&mouseY<=415) {
-    rect(595, 365, 150, 50);
-    if (isMouseReleased) {
-      if (onLevel==10)
-        onLevel=8;
-      else
-        onLevel++;
-      highestLevelReached=max(highestLevelReached, onLevel);
-      currentWindow=onLevel;
-    }
-  }
-  strokeWeight(1);
-}
-void roomThree() {
-  for (int i=13; i<24; i++) {
-    for (int j=1; j<12; j++)playerMap[i][j]=6;
-  }
-  if (roomThreeMapButtonOn) {
-    playerMap[20][8]=1;
-    playerMap[19][5]=1;
-    playerMap[19][10]=1;
-    playerMap[16][2]=1;
-    playerMap[14][7]=1;
-    playerMap[15][6]=1;
-    playerMap[15][10]=1;
-    playerMap[18][2]=7;
-  } else {
-    playerMap[19][3]=1;
-    playerMap[22][5]=1;
-    playerMap[15][2]=1;
-    playerMap[20][10]=1;
-    playerMap[16][8]=1;
-    playerMap[21][9]=1;
-    playerMap[21][7]=1;
-  }
-  playerMap[17][9]=3;
-  playerMap[20][6]=3;
-  playerMap[14][3]=3;
-  playerMap[18][4]=3;
-  drawMap();
-  timeElasped();
-  moveCharacter();
-  guiPopup();
-  drawRoomThree();
-  winPlatform();
-}
-void setupRoomThree() {
-  //0 floor
-  //1 wall
-  //2 locked box
-  //3 unlocked box
-  //4 note
-  //5 locked wall
-  //6 ice floor
-  //7 win platform
-  //8 special
-  //itemMap
-  //lockPassKey
-  //noteMap
-  //playerMap
-  for (int i=0; i<20; i++) {
-    int puzzleBoxX=(int)random(0, 7);
-    int puzzleBoxY=(int)random(0, 5);
-    roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY];
-    if (puzzleBoxX>0)roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY];
-    if (puzzleBoxY>0)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1];
-    if (puzzleBoxX<6)roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY];
-    if (puzzleBoxY<4)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
-  }
-  for (int i=0; i<12; i++)playerMap[12][i]=1;
-  playerMap[12][1]=0;
-  playerMap[6][3]=8;
-  noteMap[6][3]="3";
-  playerMap[6][5]=8;
-  noteMap[6][5]="4";
-  playerMap[6][7]=8;
-  noteMap[6][7]="8";
-  playerMap[6][9]=8;
-  noteMap[6][9]="5";
-  playerMap[12][6]=5;
-  lockPassKey[12][6]=3485;
-  itemMap[12][6]=0;
-}
-void drawRoomThree() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  //println(squareX,squareY);
-  if (lastMove=='w')squareY--;
-  else if (lastMove=='a')squareX--;
-  else if (lastMove=='s')squareY++;
-  else if (lastMove=='d')squareX++;
-  squareX=max(0, squareX);
-  squareY=max(0, squareY);
-  if (playerMap[squareX][squareY]==8) {
-    if (squareX==6&&squareY==3) {
-      if (hasMenuOpen) {
-        //11 7
-        for (int i=0; i<7; i++) {
-          for (int j=0; j<5; j++) {
-            if (roomThreeLightPuzzle[i][j]) {
-              fill(100, 100, 200);
-            } else {
-              fill(230);
-            }
-            rect(i*40+250, j*40+120, 32, 32);
-          }
-        }
-        int puzzleBoxX=(mouseX-250)/40;
-        int puzzleBoxY=(mouseY-120)/40;
-        if (mouseX>=250&&mouseY>=120) {
-          if (puzzleBoxX>=0&&puzzleBoxX<=6&&puzzleBoxY>=0&&puzzleBoxY<=4) {
-            fill(100, 200);
-            rect(puzzleBoxX*40+250, puzzleBoxY*40+120, 32, 32);
-          }
-          if (mousePressed) {
-            mouseBeenPressed=true;
-          } else {
-            if (mouseBeenPressed) {
-              roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY];
-              if (puzzleBoxX>0)roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY];
-              if (puzzleBoxY>0)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1];
-              if (puzzleBoxX<6)roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY];
-              if (puzzleBoxY<4)roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
-            }
-            mouseBeenPressed=false;
-          }
-        }
-        boolean allLightsOn=true;
-        for (int i=0; i<7; i++) {
-          for (int j=0; j<5; j++) {
-            if (!roomThreeLightPuzzle[i][j]) {
-              allLightsOn=false;
-              break;
-            }
-          }
-        }
-        if (timeSolved!=-1&&millis()-timeSolved>1000) {
-          hasMenuOpen=false;
-          timeSolved=-1;
-          playerMap[6][3]=4;
-        }
-        if (allLightsOn) {
-          for (int i=0; i<7; i++) {
-            for (int j=0; j<5; j++) {
-              fill(100, 200, 100);
-              rect(i*40+250, j*40+120, 32, 32);
-              if (timeSolved==-1) {
-                timeSolved=millis();
-              }
-            }
-          }
-        }
-        fill(0);
-        textSize(28);
-        text("Turn all to blue.", 280, 390);
-      }
-    } else if (squareX==6&&squareY==5) {
-      if (hasMenuOpen) {
-        for (int i=0; i<6; i++) {
-          for (int j=0; j<8; j++) {
-            fill(230);
-            if (roomThreeStacker[i][j]) {
-              fill(100);
-            }
-            if (j==1)fill(200, 100, 100);
-            rect(i*40+300, j*40+80, 32, 32);
-          }
-        }
-        if (roomThreeStackerLayer==0) {
-          for (int i=0; i<6; i++) {
-            for (int j=0; j<8; j++) {
-              fill(100, 200, 100);
-              rect(i*40+300, j*40+80, 32, 32);
-            }
-          }
-          if (millis()-timeSolved>1000) {
-            hasMenuOpen=false;
-            timeSolved=-1;
-            playerMap[6][5]=4;
-          }
-        } else {
-          fill(100);
-          if (timeSolved==-1)timeSolved=millis();
-          if (millis()-timeSolved>100) {
-
-            if (roomThreeStackerPos==0)roomThreeIsGoingRight=true;
-            if (roomThreeStackerPos==5)roomThreeIsGoingRight=false;
-            if (roomThreeIsGoingRight) {
-              rect(roomThreeStackerPos++*40+300, 80, 32, 32);
-            } else {
-              rect(roomThreeStackerPos--*40+300, 80, 32, 32);
-            }
-            timeSolved=millis();
-          } else {
-            if (roomThreeIsGoingRight) {
-              rect(roomThreeStackerPos*40+300, 80, 32, 32);
-            } else {
-              rect(roomThreeStackerPos*40+300, 80, 32, 32);
-            }
-          }
-          if (keyPressed&&key==' ') {
-            if (!spaceBeenPressed) {
-              if (roomThreeStackerLayer==8)roomThreeStackerLayer--;
-              else {
-                if (roomThreeStackerLayer==7||roomThreeStacker[roomThreeStackerPos][roomThreeStackerLayer+1]) {
-                  roomThreeStacker[roomThreeStackerPos][roomThreeStackerLayer--]=true;
-                  if (roomThreeStackerLayer==0)timeSolved=millis();
-                } else {
-                  roomThreeStackerLayer=7;
-                  for (int i=0; i<6; i++) {
-                    for (int j=0; j<8; j++) {
-                      roomThreeStacker[i][j]=false;
-                    }
-                  }
-                }
-              }
-            }
-            spaceBeenPressed=true;
-          } else {
-            spaceBeenPressed=false;
-          }
-        }
-      }
-    } else if (squareX==6&&squareY==7) {
-      if (hasMenuOpen) {
-        noStroke();
-        textSize(28);
-        fill(0);
-        text("Click\n<=250ms", 150, 250);
-        if (roomThreeReactionTime<=250&&roomThreeReactionTime!=0&&!roomThreeButtonOn) {
-          fill(100, 200, 100);
-          ellipse(400, 250, 250, 250);
-          text(roomThreeReactionTime+" ms", 375, 100);
-          if (millis()-timeSolved>2000) {
-            hasMenuOpen=false;
-            timeSolved=-1;
-            playerMap[6][7]=4;
-          }
-        } else if (roomThreeButtonOn) {
-          roomThreeReactionTime=millis()-timeSolved;
-          text(roomThreeReactionTime+" ms", 375, 100);
-          if (roomThreeReactionTime>1000) {
-            roomThreeButtonOn=false;
-            timeSolved=millis();
-          }
-          if (mousePressed||(keyPressed&&key==' ')) {
-            roomThreeButtonOn=false;
-            timeSolved=millis();
-            spaceBeenPressed=true;
-          }
-          fill(100, 200, 100);
-          ellipse(400, 250, 250, 250);
-        } else {
-          if (!keyPressed||timeSolved!=-1) {
-            if (timeSolved==-1)timeSolved=millis();
-
-            if (millis()-timeSolved>3000+random(0, 2)) {
-              roomThreeButtonOn=true;
-              timeSolved=millis();
-            }
-            fill(200, 100, 100);
-            if (mousePressed||(keyPressed&&key==' ')) {
-              timeSolved=millis();
-              if (!spaceBeenPressed) fill(0);
-            } else if (!mousePressed||(keyPressed&&key==' ')) {
-              spaceBeenPressed=false;
-            }
-            ellipse(400, 250, 250, 250);
-          } else {
-            fill(200, 100, 100);
-            ellipse(400, 250, 250, 250);
-            fill(0);
-          }
-          fill(0);
-          if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)text(roomThreeReactionTime+" ms", 375, 100);
-          else text("000 ms", 375, 100);
-        }
-      }
-    } else if (squareX==6&&squareY==9) {
-      if (hasMenuOpen) {
-        stroke(0);
-        if (roomThreeClickScore==90) {
-          fill(100, 200, 100);
-          text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
-          //deal with stroke
-          rect(180, 120, 440, 250);
-          if (millis()-timeSolved>1000) {
-            hasMenuOpen=false;
-            timeSolved=-1;
-            playerMap[6][9]=4;
-          }
-        } else {
-          roomThreeReactionTime=millis()-timeSolved;
-          if (roomThreeReactionTime>10000) {
-            timeSolved=-1;
-            roomThreeClickScore=0;
-          }
-          fill(0);
-          if (timeSolved==-1)text(roomThreeClickScore+" Clicks    0.000 Sec", 200, 100);
-          else text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
-
-          if (mousePressed) {
-
-            if (mouseBeenPressed&&timeSolved!=-1) {
-              mouseBeenPressed=false;
-              roomThreeClickScore++;
-            } else if (timeSolved==-1) {
-              timeSolved=millis();
-            }
-            fill(230);
-          } else {
-            mouseBeenPressed=true;
-            if (timeSolved==-1) {
-              text("Click 90 times in 10 seconds", 200, 250);
-            }
-            noFill();
-          }
-          if (roomThreeClickScore==90)timeSolved=millis();
-          println(roomThreeClickScore);
-          rect(180, 120, 440, 250);
-        }
-      }
-    }
-  } else {
-    timeSolved=-1;
-    roomThreeReactionTime=0;
-  }
-}
-void roomTwo() {
-  drawMap();
-  timeElasped();
-  image(roomTwoShape, 32, 224);
-  moveCharacter();
-  guiPopup();
-  drawRoomTwo();
-  winPlatform();
-}
-void setupRoomTwo() {
-  for (int i=0; i<25; i++)playerMap[i][6]=1;
-  for (int i=1; i<12; i++) {
-    playerMap[8][i]=1;
-    playerMap[16][i]=1;
-  }
-  playerMap[4][3]=4;
-  noteMap[4][3]="Welcome to your second room,\n"
-    +"in here we'll go back to the basics.\n"
-    +"1, 2, 3, 8, pineapple?";
-  playerMap[8][3]=5;
-  lockPassKey[8][3]=5694;
-  itemMap[8][3]=0;
-  playerMap[12][3]=4;
-  noteMap[12][3]="Hidden in plain sight";
-  playerMap[12][6]=5;
-  lockPassKey[12][6]=7219;
-  itemMap[12][6]=0;
-  playerMap[12][9]=4;
-  noteMap[12][9]="Story idea,\n\n"
-    +"Till recently, Issac's artistic naming gave\n"
-    +"lasting echos. Since questions ultimately\n"
-    +"arose relating equally. People eventually\n"
-    +"named the artist Galvin on November.\n"
-    +"Carrying its reasons can leave evidence";
-  playerMap[16][9]=5;
-  lockPassKey[16][9]=7557;
-  itemMap[16][9]=0;
-  playerMap[20][9]=4;
-  playerMap[20][6]=5;
-  lockPassKey[20][6]=5259;
-  itemMap[20][6]=0;
-  for (int i=17; i<24; i++) {
-    for (int j=1; j<6; j++)playerMap[i][j]=6;
-  }
-  playerMap[20][4]=1;
-  playerMap[23][5]=1;
-  playerMap[22][2]=1;
-  playerMap[21][1]=1;
-  playerMap[17][4]=1;
-  playerMap[18][2]=7;
-  playerMap[18][5]=1;
-}
-void drawRoomTwo() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  //println(squareX,squareY);
-  if (lastMove=='w')squareY--;
-  else if (lastMove=='a')squareX--;
-  else if (lastMove=='s')squareY++;
-  else if (lastMove=='d')squareX++;
-  squareX=max(0, squareX);
-  squareY=max(0, squareY);
-  if (playerMap[squareX][squareY]==4) {
-    if (squareX==4&&squareY==3) {
-      if (hasMenuOpen) {
-        image(roomTwoColourPuzzle, 0, 0);
-      }
-    } else if (squareX==12&&squareY==3) {
-      if (hasMenuOpen) {
-        println(" --   --        --");
-        println("   |    |    | |   |");
-        println("      --        --");
-        println("   | |       |     |");
-        println("      --        --");
-      }
-    } else if (squareX==20&&squareY==9) {
-      if (hasMenuOpen) {
-        image(roomTwoCodePuzzle, 0, 0);
-      }
+  line(400, 0, lampX, lampY);  //Draws the line hanging the light bulb
+  translate(lampX, lampY);  //Moves the lightbulb around
+  rotate(radians(lightAngle-90));  //Rotates the lightbulb the appropriate way
+  image(lantern, -16, -17, 32, 34);
+  if (isMouseReleased) {
+    if (mouseX<=750&&mouseX>=600&mouseY<=75&&mouseY>=25) {
+      currentWindow=1;  //Go to main menu
     }
   }
 }
-void roomOne() {
-  drawMap();
-  timeElasped();
-  moveCharacter();
-  guiPopup();
-  drawRoomOne();
-  winPlatform();
-}
-void setupRoomOne() {
-  for (int i=8; i<24; i++) {
-    for (int j=1; j<6; j++)playerMap[i][j]=6;
-  }
-  for (int i=14; i<24; i++) {
-    for (int j=6; j<12; j++)playerMap[i][j]=6;
-  }
-  for (int i=0; i<7; i++)playerMap[7][i]=1;
-  for (int i=0; i<14; i++)playerMap[i][6]=1;
-  playerMap[5][1]=4;
-  noteMap[5][1]="Hello Subject 1342,\n"
-    +"Welcome to my escape room! A\n"
-    +"game where you are stuck in a room\n"
-    +"and you have to solve puzzles\n"
-    +"to escape and move on to the next.\n"
-    +"To escape your first room, you\n"
-    +"need to forget who you were and\n"
-    +"focus on who you are now.\n";
-  playerMap[3][6]=5; 
-  lockPassKey[3][6]=1342;
-  itemMap[3][6]=0;
-  for (int i=0; i<13; i++)playerMap[13][i]=1;
-  playerMap[3][9]=4;
-  noteMap[3][9]="";
-  playerMap[6][9]=4;
-  noteMap[6][9]="\n\n\n\n\n\n\nHint: T is the first letter.";
-  playerMap[10][9]=2;
-  itemMap[10][9]=4;
-  lockPassKey[10][9]=3740;
-  noteMap[10][9]="Good job my subject, here\'s your\n"
-    +"next puzzle.\n"
-    +"Answer is 2019";
-  playerMap[10][6]=5;
-  //playerMap[10][6]=0;  //Delete this
-  lockPassKey[10][6]=2019;
-  playerMap[10][4]=1;
-  playerMap[11][2]=1;
-  playerMap[8][3]=4;
-  noteMap[8][3]="This will be the last message\n"
-    +"you\'ll be hearing from me.\n"
-    +"See you at the end!";
-  playerMap[13][3]=6;
-  playerMap[19][3]=1;
-  playerMap[15][7]=1;
-  playerMap[14][2]=1;
-  playerMap[21][1]=1;
-  playerMap[21][8]=1;
-  playerMap[22][4]=1;
-  playerMap[16][11]=1;
-  playerMap[18][4]=1;
-  playerMap[17][2]=1;
-  playerMap[18][10]=1;
-  playerMap[19][9]=1;
-  playerMap[23][5]=1;
-  playerMap[17][8]=1;
-  playerMap[19][11]=1;
-  //playerMap[2][2]=7;//del this
-  playerMap[22][10]=7;
-}
-void drawRoomOne() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  //println(squareX,squareY);
-  if (lastMove=='w')squareY--;
-  else if (lastMove=='a')squareX--;
-  else if (lastMove=='s')squareY++;
-  else if (lastMove=='d')squareX++;
-  squareX=max(0, squareX);
-  squareY=max(0, squareY);
-  if (playerMap[squareX][squareY]==4) {
-    if (squareX==3&&squareY==9) {
-      if (hasMenuOpen) {
-        image(roomOneGrid, 0, 0);
-      }
-    } else if (squareX==6&&squareY==9) {
-      if (hasMenuOpen) {
-        image(roomOneGridPuzzle, 0, 0);
-      }
-    }
-  }
-}
-
-void winPlatform() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  if (playerMap[squareX][squareY]==7) {
-    currentWindow=7;
-  }
-}
-
-//
-void timeElasped() {
-  secondElasped=second()-startSec;
-  minuteElasped=minute()-startMin;
-  hourElasped=hour()-startHr;
-  if (secondElasped<0) {
-    secondElasped+=60;
-    minuteElasped--;
-  }
-  if (minuteElasped<0) {
-    minuteElasped+=60;
-    hourElasped--;
-  }
-  if (hourElasped<0) {
-    hourElasped+=24;
-  }
-  String outputLine="";
-  if (hourElasped<10)
-    outputLine+="0"+hourElasped+":";
-  else outputLine+=hourElasped+":";
-  if (minuteElasped<10)outputLine+="0"+minuteElasped+":";
-  else outputLine+=minuteElasped+":";
-  if (secondElasped<10)outputLine+="0"+secondElasped;
-  else outputLine+=secondElasped;
-
-  text("Time "+outputLine, 20, 470);
-}
-void guiPopup() {
-  int squareX=characterX/32;
-  int squareY=characterY/32;
-  if (lastMove=='w')squareY--;
-  else if (lastMove=='a')squareX--;
-  else if (lastMove=='s')squareY++;
-  else if (lastMove=='d')squareX++;
-  squareX=max(0, squareX);
-  squareY=max(0, squareY);
-  //println(playerMap[squareX][squareY],squareX,squareY);
-  if (playerMap[squareX][squareY]==4) {
-    if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {
-      hasMenuOpen=true;
-      noteMessage="";
-      spaceBeenPressed=false;
-    }
-    if (hasMenuOpen) {
-      image(paperNote, 0, 0);
-      PFont font = loadFont("YuGothicUI-Bold-48.vlw");
-      textFont(font);
-      textSize(30);
-      if (noteMessage.length()!=noteMap[squareX][squareY].length())
-        noteMessage+=noteMap[squareX][squareY].charAt(noteMessage.length());
-      else {
-        fill(100);
-        text("Press any key to continue...", 200, 425);
-      }
-      fill(0);
-      text(noteMessage+"_", 150, 100);
-      if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))hasMenuOpen=false;
-      if (!keyPressed)spaceBeenPressed=true;
-    } else {
-      if (!keyPressed)spaceBeenPressed=false;
-    }
-  } else if (playerMap[squareX][squareY]==2||playerMap[squareX][squareY]==5) {  //Maybe switch 5 to its own if
-    if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {
-      hasMenuOpen=true;
-      for (int i=0; i<4; i++) {
-        finalValue[i]=0;
-        curValue[i]=0;
-        scrollX[i]=0;
-        distance[i]=0;
-      }
-      colourSection=0;
-      shackleY=0;
-      numComb=0;
-      hasUnlocked=false;
-      spaceBeenPressed=false;
-    }
-    if (hasMenuOpen) {
-
-      strokeWeight(10);
-      fill(240);
-      stroke(0);
-      rect(96, 32, 608, 384);
-      fill(100);
-      textSize(30);
-      text("Press\nany\nkey\nto\ncontinue", 125, 200);
-      textSize(20);
-      strokeWeight(28);
-      noFill();
-      stroke(0);
-      if (hasUnlocked) {
-        stroke(100, 200, 100);
-      }
-      arc(400, 150-shackleY, 200, 200, PI, 2*PI);
-      line(300, 150-shackleY, 300, 200);
-      line(500, 150-shackleY, 500, 200-shackleY);
-      strokeWeight(1);
-      fill(0);
-      if (hasUnlocked) {
-        fill(100, 200, 100);
-      }
-      rect(250, 200, 300, 200, 14);
-      strokeWeight(2);
-      stroke(255);
-      line(270, 292, 280, 292);
-      line(520, 292, 530, 292);
-      strokeWeight(1);
-      if (!hasUnlocked) {
-        int wheelNum=(mouseX-305)/50;
-        if (wheelNum>=0&&wheelNum<=3&&mouseX>=30&&mouseX<=495) {
-
-          if (mousePressed) {
-            distance[wheelNum]=scrollX[wheelNum]-mouseY;
-            distance[wheelNum]/=15;
-            if (distance[wheelNum]<0)distance[wheelNum]+=10;
-            distance[wheelNum]%=10;
-            curValue[wheelNum]=distance[wheelNum]+finalValue[wheelNum];
-          } else {
-            scrollX[wheelNum]=mouseY;
-            finalValue[wheelNum]=curValue[wheelNum];
-          }
-          if (curValue[wheelNum]<0)curValue[wheelNum]+=10;
-          curValue[wheelNum]%=10;
-        }
-      } else {
-        shackleY=min(40, shackleY+2);
-        if (shackleY==40) {
-          hasMenuOpen=false;
-          delay(2000);
-          playerMap[squareX][squareY]=itemMap[squareX][squareY];
-        }
-      }
-      numComb=0;
-      boolean isInOneSection=false;
-      for (int j=0; j<4; j++) {
-
-        if (mouseX>=305+50*j&&mouseX<=345+50*j&&(mousePressed||(mouseY>=250&&mouseY<=340))&&!hasUnlocked) {
-          isInOneSection=true;
-          fill(255-min(255, colourSection));
-          stroke(255-min(255, colourSection));
-          rect(305+50*j, 250, 40, 90);
-          fill(min(255, colourSection));
-          stroke(min(255, colourSection));
-          colourSection+=10;
-        } else {
-          fill(255);
-          stroke(255);
-          rect(305+50*j, 250, 40, 90);
-          fill(0);
-        }
-        for (int i=0; i<3; i++) {
-          text((i+curValue[j])%10, 320+50*j, 300+30*(i-1));
-        }
-        numComb*=10;
-        numComb+=(1+curValue[j])%10;
-      }
-      if (!isInOneSection)colourSection=0;
-      if (lockPassKey[squareX][squareY]==numComb)hasUnlocked=true;
-      if (keyPressed&&(key!=' '||spaceBeenPressed))hasMenuOpen=false;
-      if (!keyPressed)spaceBeenPressed=true;
-    } else {
-      if (!keyPressed)spaceBeenPressed=false;
-    }
-  } else if (playerMap[squareX][squareY]==3) {
-    if (keyPressed&&key==' ') {
-      if (spaceBeenPressed) {
-        roomThreeMapButtonOn=!roomThreeMapButtonOn;
-        spaceBeenPressed=false;
-      }
-      //Switch button
-    } else {
-      spaceBeenPressed=true;
-    }
-  } else if (playerMap[squareX][squareY]==8) {
-    if (keyPressed&&key==' '&&!hasMenuOpen) {
-      hasMenuOpen=true;
-      roomThreeStackerLayer=8;
-    }
-    if (hasMenuOpen) {
-      image(paperNote, 0, 0);
-      PFont font = loadFont("YuGothicUI-Bold-48.vlw");
-      textFont(font);
-      textSize(30);
-      fill(100);
-      text("Press any key to continue...", 200, 425);
-      if (keyPressed&&key!=' ')hasMenuOpen=false;
-    }
-  }
-}
-void resetRoom() {
-  hasControl=true;
-  characterX=32*5;
-  characterY=32*5;
-  lastMove='d';
-  colourSection=0;
-  shackleY=0;
-  numComb=0;
-  hasMenuOpen=false;
-  for (int i=0; i<4; i++) {
-    finalValue[i]=0;
-    curValue[i]=0;
-    scrollX[i]=0;
-    distance[i]=0;
-    playerBar[i]=0;
-  }
-  for (int i=0; i<25; i++) {
-    for (int j=0; j<13; j++) {
-      playerMap[i][j]=0;
-      noteMap[i][j]="";
-      lockPassKey[i][j]=0;
-      itemMap[i][j]=0;
-    }
-  }
-  for (int i=0; i<25; i++)playerMap[i][0]=1;
-  for (int i=0; i<25; i++)playerMap[i][12]=1;
-  for (int i=0; i<13; i++)playerMap[0][i]=1;
-  for (int i=0; i<13; i++)playerMap[24][i]=1;
-}
-void playGame() {
-  if (hasWentToCharacter) {
-    currentWindow=onLevel;
-  } else {
-    background(#ff6700 );
-    fill(0);
-    text("You have not customized your character.\nAre you sure you want to continue\nwith the default settings?", 0, 50);
-    characterX=10;
-    characterY=100;
-    colourPickerSample();
-    stroke(100, 100, 200);
-    fill(100, 100, 200);
-    rect(300, 200, 200, 100);
-    rect(550, 200, 200, 100);
-    if (mouseX<=500&&mouseX>=300&&mouseY<=300&&mouseY>=200) {
-      stroke(200, 200, 255);
-      fill(200, 200, 255);
-      rect(300, 200, 200, 100);
-      if (isMouseReleased)currentWindow=1;//mainMenu
-    } else if (mouseX<=750&&mouseX>=550&&mouseY<=300&&mouseY>=200) {
-      stroke(200, 200, 255);
-      fill(200, 200, 255);
-      rect(550, 200, 200, 100);
-      if (isMouseReleased) {
-        currentWindow=onLevel;//Room one
-        hasWentToCharacter=true;
-      }
-    }
-    fill(0);
-    textSize(30);
-    text("No, take me\nback", 320, 240);
-    text("Yes, let's\ncontinue", 575, 240);
-    //Warning screen
-  }
-}
-void drawMap() {
-  background(100);
-  for (int i=0; i<25; i++) {
-    for (int j=0; j<13; j++) {
-      if (playerMap[i][j]!=1) {
-        if ((i+j)%2==0) {
-          stroke(#000080);
-          fill(#000080);
-          rect(32*i, 32*j, 31, 31);
-        } else {
-          stroke(#add8e6);
-          fill(#add8e6);
-          rect(32*i, 32*j, 31, 31);
-        }
-      }
-      if (playerMap[i][j]==1) {
-        stroke(200);
-        fill(200);
-        rect(32*i, 32*j, 31, 31);
-      } else if (playerMap[i][j]==2) {
-        image(lockedBox, 32*i, 32*j);
-      } else if (playerMap[i][j]==3) {
-        //Switch
-        fill(200);
-        stroke(200);
-        ellipse(32*i+16, 32*j+16, 15, 15);
-      } else if (playerMap[i][j]==4) {
-        image(note, 32*i, 32*j);
-      } else if (playerMap[i][j]==5) {
-        image(lockedWall, 32*i, 32*j);
-      } else if (playerMap[i][j]==7) {
-        stroke(100, 200, 100);
-        fill(100, 200, 100);
-        rect(32*i, 32*j, 31, 31);
-      } else if (playerMap[i][j]==6) {
-        stroke(200);
-        fill(200);
-        rect(32*i, 32*j, 31, 31);
-        image(iceFloor, 32*i, 32*j);
-      } else if (playerMap[i][j]==8) {
-        image(miniGame, 32*i, 32*j);
-      }
-    }
-  }
-  fill(100, 100, 200);
-  stroke(100, 100, 200);
-  if (mouseX>=340&&mouseX<=500&&mouseY>=430&&mouseY<=480) {
-    fill(150, 150, 250);
-    stroke(150, 150, 250);
-    if (isMouseReleased) {
-      currentWindow=2;
-      delay(100);
-    }
-  } else {
-    fill(100, 100, 200);
-    stroke(100, 100, 200);
-  }
-  rect(340, 430, 160, 50);
-  if (mouseX>=540&&mouseX<=770&&mouseY>=430&&mouseY<=480) {
-    fill(150, 150, 250);
-    stroke(150, 150, 250);
-    if (isMouseReleased)currentWindow=1;
-  } else {
-    fill(100, 100, 200);
-    stroke(100, 100, 200);
-  }
-  rect(540, 430, 230, 50);
-  fill(255);
-  textSize(40);
-  text("Restart", 350, 470);
-  text("Main Menu", 550, 470);
-}
-void moveCharacter() {
-
-  if (hasControl) {
-    if (lastMove=='w') characterBackIdle();
-    if (lastMove=='a') characterLeftIdle();
-    if (lastMove=='s') characterFwdIdle();
-    if (lastMove=='d') characterRightIdle();
-    if (!hasMenuOpen) {
-      if (keyPressed) {
-        if (key=='w'||(key==CODED&&keyCode==UP)) {
-          lastMove='w';
-          hasControl=false;
-        }
-        if (key=='a'||(key==CODED&&keyCode==LEFT)) {
-          lastMove='a';
-          hasControl=false;
-        }
-        if (key=='s'||(key==CODED&&keyCode==DOWN)) {
-          lastMove='s';
-          hasControl=false;
-        }
-        if (key=='d'||(key==CODED&&keyCode==RIGHT)) {
-          lastMove='d';
-          hasControl=false;
-        }
-      }
-      characterGridX=characterX/32;
-      characterGridY=characterY/32;
-      moveCharacterMoves=0;
-      moveCharacterFrame=0;
-    }
-  } else {
-    if (!hasMenuOpen) {
-      if (lastMove=='w') {
-        if (moveCharacterFrame++==0) {
-          moveCharacterMoves++;
-          characterY-=2;
-        }
-        if (moveCharacterMoves%2==0) characterBackOne();
-        else characterBackTwo();
-        if (playerMap[characterGridX][characterGridY-1]!=0
-          &&playerMap[characterGridX][characterGridY-1]!=6
-          &&playerMap[characterGridX][characterGridY-1]!=7) {
-
-          if (moveCharacterMoves>4) {
-            characterY+=10;
-            hasControl=true;
-          }
-        }
-      }
-      if (lastMove=='a') {
-        if (moveCharacterFrame++==0) {
-          moveCharacterMoves++;
-          characterX-=2;
-        }
-        if (moveCharacterMoves%2==0) characterLeftOne();
-        else characterLeftTwo();
-        if (playerMap[characterGridX-1][characterGridY]!=0
-          &&playerMap[characterGridX-1][characterGridY]!=6
-          &&playerMap[characterGridX-1][characterGridY]!=7) {
-
-          if (moveCharacterMoves>4) {
-            characterX+=10;
-            hasControl=true;
-          }
-        }
-      }
-      if (lastMove=='s') {
-        if (moveCharacterFrame++==0) {
-          moveCharacterMoves++;
-          characterY+=2;
-        }
-        if (moveCharacterMoves%2==0) characterFwdOne();
-        else characterFwdTwo();
-        if (playerMap[characterGridX][characterGridY+1]!=0
-          &&playerMap[characterGridX][characterGridY+1]!=6
-          &&playerMap[characterGridX][characterGridY+1]!=7) {
-          if (moveCharacterMoves>4) {
-            characterY-=10;
-            hasControl=true;
-          }
-        }
-      }
-      if (lastMove=='d') {
-        if (moveCharacterFrame++==0) {
-          moveCharacterMoves++;
-          characterX+=2;
-        }
-        if (moveCharacterMoves%2==0) characterRightOne();
-        else characterRightTwo();
-        if (playerMap[characterGridX+1][characterGridY]!=0
-          &&playerMap[characterGridX+1][characterGridY]!=6
-          &&playerMap[characterGridX+1][characterGridY]!=7) {
-          if (moveCharacterMoves>4) {
-            characterX-=10;
-            hasControl=true;
-          }
-        }
-      }
-      moveCharacterFrame%=1;//This will be the FPS of the character
-      if (moveCharacterMoves==16) {
-        characterGridX=characterX/32;
-        characterGridY=characterY/32;
-        if (playerMap[characterGridX][characterGridY]==0
-          ||playerMap[characterGridX][characterGridY]==7)
-          hasControl=true;
-        moveCharacterMoves=0;
-        moveCharacterFrame=0;
-      }
-    }
-  }
-}
-void levelSelection() {
+void mainMenu() {  //The mainmenu
   background(bg);
-  noFill();
-  stroke(255);
-  strokeWeight(10);
-  rect(125, 100, 150, 150);
-  rect(325, 100, 150, 150);
-  rect(525, 100, 150, 150);
-  rect(300, 350, 200, 75);
-  fill(255);
-  text("Room\nOne", 150, 150);
-  text("Room\nTwo", 350, 150);
-  text("Room\nThree", 550, 150);
-  text("Go Back", 345, 400);
-  if (highestLevelReached<9) {
-    fill(100, 100);
-    rect(325, 100, 150, 150);
-  }
-  if (highestLevelReached<10) {
-    fill(100, 100);
-    rect(525, 100, 150, 150);
-  }
-  if (mouseX>=125&&mouseX<=275&&mouseY>=100&&mouseY<=250&&highestLevelReached>=8) {
-    fill(200);
-    stroke(200);
-    rect(125, 100, 150, 150);
-    fill(100);
-    text("Room\nOne", 150, 150);
-    if (isMouseReleased)currentWindow=8;
-  } else if (mouseX>=325&&mouseX<=475&&mouseY>=100&&mouseY<=250&&highestLevelReached>=9) {
-    fill(200);
-    stroke(200);
-    rect(325, 100, 150, 150);
-    fill(100);
-    text("Room\nTwo", 350, 150);
-    if (isMouseReleased)currentWindow=9;
-  } else if (mouseX>=525&&mouseX<=675&&mouseY>=100&&mouseY<=250&&highestLevelReached>=10) {
-    fill(200);
-    stroke(200);
-    rect(525, 100, 150, 150);
-    fill(100);
-    text("Room\nThree", 550, 150);
-    if (isMouseReleased)currentWindow=10;
-  } else if (mouseX>=300&&mouseX<=500&&mouseY>=350&&mouseY<=425) {
-    fill(200);
-    stroke(200);
-    rect(300, 350, 200, 75);
-    fill(100);
-    text("Go Back", 345, 400);
-    if (isMouseReleased)currentWindow=1;
-  }
-
-  strokeWeight(1);
-}
-void drawColourSquare() {
-  for (int i=0; i<256; i++) {
-    for (int j=0; j<256; j++) {
-      stroke(h, j, 255-i);
-      point(j+colourSquareX, i+colourSquareY);
-    }
-  }
-}
-void colourPicker() {
-  hasWentToCharacter=true;
-  characterX=0;
-  characterY=100;
-  stroke(200);
-  fill(200);
-  rect(colourSquareX+s-3, colourSquareY+255-b+3, 6, -6);
-
-  //This is to match the pixels that the pointer was on
-  colorMode(HSB);
-  for (int i=max(s-3, 0); i<=min(s+3, 255); i++) {
-    for (int j=max(b-3, 0); j<=min(b+3, 255); j++) {
-      stroke(h, i, j);
-      point(i+colourSquareX, 255+colourSquareY-j);
-    }
-  }
-  if (mousePressed) {
-    if (mouseX<=650&&mouseX>=450&&mouseY<=65&&mouseY>=15) {
-      h=(int)hue(characterHairOne);
-      s=(int)saturation(characterHairOne);
-      b=(int)brightness(characterHairOne);
-      chosenHair=true;
-      drawColourSquare();
-      colorMode(RGB);
-      stroke(200);
-      fill(200);
-      rect(colourSquareX, colourSquareY, 255, 255);
-      colorMode(HSB);
-      drawColourSquare();
-    } else if (mouseX<=650&&mouseX>=450&&mouseY<=140&&mouseY>=90) {
-      h=(int)hue(characterPantsOne);
-      s=(int)saturation(characterPantsOne);
-      b=(int)brightness(characterPantsOne);
-      chosenHair=false;
-      colorMode(RGB);
-      stroke(200);
-      fill(200);
-      rect(colourSquareX, colourSquareY, 255, 255);
-      colorMode(HSB);
-      drawColourSquare();
-    }
-  }
-  if (chosenHair) {
-    characterHairOne=color(h, s, b);
-    characterHairTwo=color(h, s, b*.9);
-    stroke(255);
-    fill(200);
-    rect(450, 90, 200, 50);
-    stroke(150, 100, 200);
-    fill(150, 100, 200);
-    rect(450, 15, 200, 50);
-  } else {
-    characterPantsOne=color(h, s, b);
-    characterPantsTwo=color(h, s, b*.65);
-    characterPantsThree=color(h, s, b*.6);
-    stroke(255);
-    fill(200);
-    rect(450, 15, 200, 50);//TODO change it to a more appeasing colour
-    stroke(150, 100, 200);
-    fill(150, 100, 200);
-    rect(450, 90, 200, 50);
-  }
-  fill(200, 100, 100);
-  textSize(48);
-  text("Hair", 495, 58);
-  text("Pants", 480, 130);
-  colorMode(RGB);
-  colourPickerSample();
-
-  colorMode(HSB);
-  for (int i=0; i<256; i++) {
-    stroke(i, 255, 255);
-    line(colourSquareX+300, i+colourSquareY, colourSquareX+325, i+colourSquareY);
-  }
-  if (mousePressed) {
-    if (mouseX<=colourSquareX+255&&mouseX>=colourSquareX&&mouseY<=colourSquareY+255&&mouseY>=colourSquareY) {  //The square
-      s=mouseX-colourSquareX;
-      b=255-mouseY+colourSquareY;
-    } else if (mouseX<=colourSquareX+325&&mouseX>=colourSquareX+300&&mouseY<=colourSquareY+255&&mouseY>=colourSquareY) {  //The slide
-      h=mouseY-colourSquareY;
-
-      //To redraw a neutral background
-      colorMode(RGB);
-      stroke(200);
-      fill(200);
-      rect(colourSquareX, colourSquareY, 255, 255);
-
-      //Redraw square
-      colorMode(HSB);
-      drawColourSquare();
-    }
-  }
-
-  //Draws the pointer to where the mouse is
-  colorMode(RGB);
-  stroke(255);
-  fill(255);
-  line(colourSquareX+300, h+colourSquareY, colourSquareX+325, h+colourSquareY);
-  ellipse(s+colourSquareX, colourSquareY+255-b, 5, 5);
-
-  //Main menu
-  if (mouseX>=550&&mouseX<=750&&mouseY>=425&&mouseY<=475) {
-    fill(100, 200, 200);
-    stroke(100, 200, 200);
-    if (mousePressed) currentWindow=1;
-  }
-  textSize(30);
-  rect(550, 425, 200, 50);
-  fill(100, 100, 200);
-  text("Main Menu", 575, 460);
-}
-void mainMenu() {
-  background(bg);
-  //Do a background gameplay of your character
   PFont font = loadFont("YuGothicUI-Bold-48.vlw");
   stroke(100);
   strokeWeight(3);
   noFill();
-  rect(300, 100, 200, 50);
+  rect(300, 100, 200, 50);  //The buttons
   rect(300, 175, 200, 50);
   rect(300, 250, 200, 50);
   rect(300, 325, 200, 50);
   rect(300, 400, 200, 50);
   fill(255);
   textFont(font);
-  text("Escape Room", 250, 50);
+  text("Escape Room", 250, 50);  //Title
   textSize(30);
-  text("Play", 370, 135);
+  text("Play", 370, 135);  //Options
   text("Levels", 355, 210);
   text("Character", 335, 285);
   text("Instructions", 320, 360);
   text("Quit", 370, 435);
-  if (mouseX<=500&&mouseX>=300&&mouseY<=150&&mouseY>=100) {
+  if (mouseX<=500&&mouseX>=300&&mouseY<=150&&mouseY>=100) {  //Every statement has a shading effect and when clicked, each will lead you to the respective screen
     if (mainMenuBoxes+3<=255)mainMenuBoxes+=3;
     fill(mainMenuBoxes);
     stroke(mainMenuBoxes);
@@ -1457,62 +325,1296 @@ void mainMenu() {
     text("Quit", 370, 435);
     if (isMouseReleased) currentWindow=6;
   } else {
-    mainMenuBoxes=100;
+    mainMenuBoxes=100;  //If none of the screens are chosen, reset the shading effect
   }
 }
-void splashScreen() {
+void playGame() {  //To determine which room two move to and to display a warning screen if user did not customize character
+  if (hasWentToCharacter) {  //If already went to colourPicker
+    currentWindow=onLevel;  //Move to the appropriate room
+  } else {
+    //Warning screen
+    background(#ff6700);
+    fill(0);
+    text("You have not customized your character.\nAre you sure you want to continue\nwith the default settings?", 0, 50);
+    characterX=10;
+    characterY=100;
+    colourPickerSample();
+    stroke(100, 100, 200);
+    fill(100, 100, 200);
+    rect(300, 200, 200, 100);
+    rect(550, 200, 200, 100);
+    if (mouseX<=500&&mouseX>=300&&mouseY<=300&&mouseY>=200) {
+      stroke(200, 200, 255);  //Highlights when hovered
+      fill(200, 200, 255);
+      rect(300, 200, 200, 100);
+      if (isMouseReleased)currentWindow=1;//Move to main menu
+    } else if (mouseX<=750&&mouseX>=550&&mouseY<=300&&mouseY>=200) {
+      stroke(200, 200, 255);  //Highlights when hovered
+      fill(200, 200, 255);
+      rect(550, 200, 200, 100);
+      if (isMouseReleased) {
+        currentWindow=onLevel;//Move to the rooms
+        hasWentToCharacter=true;
+      }
+    }
+    fill(0);
+    textSize(30);
+    text("No, take me\nback", 320, 240);
+    text("Yes, let's\ncontinue", 575, 240);
+  }
+}
+void drawColourSquare() {  //Draws the Rainbow square
+  for (int i=0; i<256; i++) {
+    for (int j=0; j<256; j++) {
+      stroke(h, j, 255-i);
+      point(j+colourSquareX, i+colourSquareY);
+    }
+  }
+}
+void colourPicker() {  //Character customization
+  hasWentToCharacter=true;
+  characterX=0;
+  characterY=100;
+  //First draw over the previous point by giving it a neutral background
+  stroke(200);
+  fill(200);
+  rect(colourSquareX+s-3, colourSquareY+255-b+3, 6, -6);
 
-  float lightAngle=30*sin(radians(sineWaveT))+90;
-  sineWaveT+=3;
-  float lampX=200*cos(radians(lightAngle))+400, lampY=200*sin(radians(lightAngle));
-  textSize(50);
-  PFont font = loadFont("YuGothicUI-Bold-48.vlw");
-  PImage lantern=loadImage("lantern.png");
-  foreGround.beginDraw();
-  foreGround.smooth();
-  foreGround.background(bg);
-  foreGround.stroke(255);
-  foreGround.fill(255);
-  foreGround.textFont(font);
-  foreGround.text("Josh's", 50, 50);
-  foreGround.text("Escape", 150, 100);
-  foreGround.text("Room", 250, 150);
-  foreGround.text("Click \"Play\" to continue", 150, 250);
-  foreGround.textSize(24);
-  foreGround.text("Good Luck, Have Fun!", 50, 450);
-  foreGround.stroke(100);
-  if (mouseX<=750&&mouseX>=600&mouseY<=75&&mouseY>=25) foreGround.fill(100, 200, 100);//TODO change colour to nicer colour
-  foreGround.rect(600, 25, 150, 50);
-  foreGround.fill(100);
-  foreGround.textSize(48);
-  foreGround.text("Play", 625, 63);
-  foreGround.endDraw();
-  foreGround.loadPixels();
-  //Cite 1
-  for (int i=0; i<800; i++) {
-    for (int j=0; j<500; j++) {
-      int loc=i+j*800;
-      float r=red(foreGround.pixels[loc]);
-      float g=green(foreGround.pixels[loc]);
-      float b=blue(foreGround.pixels[loc]);
-      float d = min(dist(lampX, lampY, i, j), dist(mouseX, mouseY, i, j));
-      float f=map(d, 0, 100, 1.5, 0);
-      foreGround.pixels[loc]=color(r*f, g*f, b*f);
+  //This is to match the pixels that the pointer was on
+  colorMode(HSB);
+  for (int i=max(s-3, 0); i<=min(s+3, 255); i++) {
+    for (int j=max(b-3, 0); j<=min(b+3, 255); j++) {
+      stroke(h, i, j);
+      point(i+colourSquareX, 255+colourSquareY-j);
     }
   }
-  image(foreGround, 0, 0);
+  if (mousePressed) {
+    if (mouseX<=650&&mouseX>=450&&mouseY<=65&&mouseY>=15) {  //Hair option
+      h=(int)hue(characterHairOne);
+      //https://processing.org/reference/hue_.html
+      s=(int)saturation(characterHairOne);
+      //https://processing.org/reference/saturation_.html
+      b=(int)brightness(characterHairOne);
+      //https://processing.org/reference/brightness_.html
+      chosenHair=true;
+      drawColourSquare();
+      colorMode(RGB);
+      stroke(200);
+      fill(200);
+      rect(colourSquareX, colourSquareY, 255, 255);
+      colorMode(HSB);
+      drawColourSquare();
+    } else if (mouseX<=650&&mouseX>=450&&mouseY<=140&&mouseY>=90) {  //Pants option
+      h=(int)hue(characterPantsOne);
+      s=(int)saturation(characterPantsOne);
+      b=(int)brightness(characterPantsOne);
+      chosenHair=false;
+      colorMode(RGB);
+      stroke(200);
+      fill(200);
+      rect(colourSquareX, colourSquareY, 255, 255);
+      colorMode(HSB);
+      drawColourSquare();
+    }
+  }
+  if (chosenHair) {  //Sets the colours chosen to the respective variables
+    characterHairOne=color(h, s, b);
+    characterHairTwo=color(h, s, b*.9);
+    stroke(255);
+    fill(200);
+    rect(450, 90, 200, 50);
+    stroke(150, 100, 200);
+    fill(150, 100, 200);
+    rect(450, 15, 200, 50);
+  } else {
+    characterPantsOne=color(h, s, b);
+    characterPantsTwo=color(h, s, b*.65);
+    characterPantsThree=color(h, s, b*.6);
+    stroke(255);
+    fill(200);
+    rect(450, 15, 200, 50);//TODO change it to a more appeasing colour
+    stroke(150, 100, 200);
+    fill(150, 100, 200);
+    rect(450, 90, 200, 50);
+  }
+  fill(200, 100, 100);
+  textSize(48);
+  text("Hair", 495, 58);
+  text("Pants", 480, 130);
+  colorMode(RGB);
+  colourPickerSample();  //Draws preview of character
+
+  colorMode(HSB);
+  for (int i=0; i<256; i++) {  //Draws the sidebar 
+    stroke(i, 255, 255);
+    line(colourSquareX+300, i+colourSquareY, colourSquareX+325, i+colourSquareY);
+  }
+  if (mousePressed) {
+    if (mouseX<=colourSquareX+255&&mouseX>=colourSquareX&&mouseY<=colourSquareY+255&&mouseY>=colourSquareY) {  //The square
+      s=mouseX-colourSquareX;
+      b=255-mouseY+colourSquareY;
+    } else if (mouseX<=colourSquareX+325&&mouseX>=colourSquareX+300&&mouseY<=colourSquareY+255&&mouseY>=colourSquareY) {  //The slide
+      h=mouseY-colourSquareY;
+
+      //To redraw a neutral background
+      colorMode(RGB);
+      stroke(200);
+      fill(200);
+      rect(colourSquareX, colourSquareY, 255, 255);
+
+      //Redraw square
+      colorMode(HSB);
+      drawColourSquare();
+    }
+  }
+
+  //Draws the pointer to where the mouse is
+  colorMode(RGB);
   stroke(255);
-  line(400, 0, lampX, lampY);
-  translate(lampX, lampY);
-  rotate(radians(lightAngle-90));
-  image(lantern, -16, -17, 32, 34);
-  if (isMouseReleased) {
-    if (mouseX<=750&&mouseX>=600&mouseY<=75&&mouseY>=25) {
+  fill(255);
+  line(colourSquareX+300, h+colourSquareY, colourSquareX+325, h+colourSquareY);
+  ellipse(s+colourSquareX, colourSquareY+255-b, 5, 5);
+
+  //Go back to main menu
+  if (mouseX>=550&&mouseX<=750&&mouseY>=425&&mouseY<=475) {
+    fill(100, 200, 200);
+    stroke(100, 200, 200);
+    if (mousePressed) currentWindow=1;
+  }
+  textSize(30);
+  rect(550, 425, 200, 50);
+  fill(100, 100, 200);
+  text("Main Menu", 575, 460);
+}
+void levelSelection() {  //Displays level options and which are unlock
+  background(bg);
+  noFill();
+  stroke(255);
+  strokeWeight(10);
+  rect(125, 100, 150, 150);  //Levels
+  rect(325, 100, 150, 150);
+  rect(525, 100, 150, 150);
+  rect(300, 350, 200, 75);  //Main Menu
+  fill(255);
+  text("Room\nOne", 150, 150);
+  text("Room\nTwo", 350, 150);
+  text("Room\nThree", 550, 150);
+  text("Go Back", 345, 400);
+  if (highestLevelReached<9) {  //Shades it if you have not reached that level yet
+    fill(100, 100);
+    rect(325, 100, 150, 150);
+  }
+  if (highestLevelReached<10) {
+    fill(100, 100);
+    rect(525, 100, 150, 150);
+  }
+  if (mouseX>=125&&mouseX<=275&&mouseY>=100&&mouseY<=250&&highestLevelReached>=8) {  //Highlighting if hovering over, and switching screenstate when clicked 
+    fill(200);
+    stroke(200);
+    rect(125, 100, 150, 150);
+    fill(100);
+    text("Room\nOne", 150, 150);
+    if (isMouseReleased) {
+      currentWindow=8;
+      onLevel=8;
+    }
+  } else if (mouseX>=325&&mouseX<=475&&mouseY>=100&&mouseY<=250&&highestLevelReached>=9) {
+    fill(200);
+    stroke(200);
+    rect(325, 100, 150, 150);
+    fill(100);
+    text("Room\nTwo", 350, 150);
+    if (isMouseReleased) {
+      currentWindow=9;
+      onLevel=9;
+    }
+  } else if (mouseX>=525&&mouseX<=675&&mouseY>=100&&mouseY<=250&&highestLevelReached>=10) {
+    fill(200);
+    stroke(200);
+    rect(525, 100, 150, 150);
+    fill(100);
+    text("Room\nThree", 550, 150);
+    if (isMouseReleased) {
+      currentWindow=10;
+      onLevel=10;
+    }
+  } else if (mouseX>=300&&mouseX<=500&&mouseY>=350&&mouseY<=425) {  //Go back to mainmenu
+    fill(200);
+    stroke(200);
+    rect(300, 350, 200, 75);
+    fill(100);
+    text("Go Back", 345, 400);
+    if (isMouseReleased)currentWindow=1;
+  }
+
+  strokeWeight(1);
+}
+void instructions() {  //This displays the icons that will be used in the program with instructions on how to user each
+  //Draw the icons
+  background(bg);
+  stroke(255);
+  fill(255);
+  text("Controls", 50, 82);
+  line(50, 122, 150, 122);
+  image(note, 50, 200);
+  image(lockedWall, 50, 250);
+  image(iceFloor, 50, 300);
+  image(miniGame, 50, 350);
+  text("Main Menu", 50, 450);
+  fill(100, 200, 100);
+  noStroke();
+  rect(50, 150, 32, 32);
+  fill(255);
+  stroke(255);
+  noFill();
+
+  //The information rectangle
+  rect(300, 50, 450, 400);
+
+  if (mouseX>=45&&mouseX<=205&&mouseY>=420&&mouseY<=455) {  //Main menu
+    fill(255);
+    rect(45, 420, 160, 35);
+    fill(0);
+    text("Main Menu", 50, 450);
+    fill(255);
+    if (isMouseReleased)
       currentWindow=1;
+  }
+  if (mouseX>=45&&mouseX<=170&&mouseY>=55&&mouseY<=90) {  //Controls
+    rect(45, 55, 125, 35);
+    text("You can use either WASD or\nARROW KEYS to move around\nyour character.\n\n\nUse the spacebar to interact\nwith items.", 325, 100);
+  } else if (mouseX>=50&&mouseX<=82&&mouseY>=150&&mouseY<=182) {  //Locked Box
+    rect(50, 150, 32, 32);
+    text("This platform is how you will\nescape each room,\nstand on it and you're out!", 325, 100);
+  } else if (mouseX>=50&&mouseX<=82&&mouseY>=200&&mouseY<=232) {  //Note Paper
+    rect(50, 200, 32, 32);
+    text("These pieces of paper\nmysteriously left by the last\nroam these rooms could be\nyour escape.\n\nRead them carefully.", 325, 100);
+  } else if (mouseX>=50&&mouseX<=82&&mouseY>=250&&mouseY<=282) {  //Locked Wall
+    rect(50, 250, 32, 32);
+    text("These wall combination\nlocks needs a 4 digit code\nin order to unlock it and move\non.\n\nTo move the dial,\nclick and drag.", 325, 100);
+  } else if (mouseX>=50&&mouseX<=82&&mouseY>=300&&mouseY<=332) {  //Ice Floor
+    rect(50, 300, 32, 32);
+    text("This slippery floor\nis apart of every room.\n\nYour player can't stop moving\nuntil it hits a wall.", 325, 100);
+  } else if (mouseX>=50&&mouseX<=82&&mouseY>=350&&mouseY<=382) {  //Minigame
+    rect(50, 350, 32, 32);
+    text("These icons represent a game\nneeded to be completed\nbefore getting your next\nhint.\n\nTo interact, you can use the \nmouse, the spacebar or\nboth.", 325, 100);
+  } else {  //introduction
+    text("Welcome to the instruction\nmenu.\n\nHover over any of the icons to\nget a description of said item.\n\n\nClick on \"Main Menu \" to go\nback", 325, 100);
+  }
+}
+void goodBye() {  //goodbye screen
+  background(bg);
+  fill(255);
+  textSize(30);
+  textAlign(CENTER);
+  text("Thank you for playing my game\nEscape Room\nMade by Joshua Liu", 400, 100);
+  fill(200);
+  text("Press any key to close game.", 400, 450);
+  if (keyPressed)  //exit is any key is pressed
+    //https://processing.org/reference/exit_.html
+    exit();
+}
+
+void roomThree() {  //room three
+  for (int i=13; i<24; i++) {
+    for (int j=1; j<12; j++)playerMap[i][j]=6;  //keeps resetting portion of the room to ice
+  }
+  if (roomThreeMapButtonOn) {  //Draws different walls based on the button state
+    playerMap[20][8]=1;
+    playerMap[19][5]=1;
+    playerMap[19][10]=1;
+    playerMap[16][2]=1;
+    playerMap[14][7]=1;
+    playerMap[15][6]=1;
+    playerMap[15][10]=1;
+    playerMap[18][2]=7;  //Win platform
+  } else {
+    playerMap[19][3]=1;
+    playerMap[22][5]=1;
+    playerMap[15][2]=1;
+    playerMap[20][10]=1;
+    playerMap[16][8]=1;
+    playerMap[21][9]=1;
+    playerMap[21][7]=1;
+  }
+
+  //The toggleable buttons
+  playerMap[17][9]=3;
+  playerMap[20][6]=3;
+  playerMap[14][3]=3;
+  playerMap[18][4]=3;
+
+  drawMap();
+  timeElasped();
+  moveCharacter();
+  guiPopup();
+  drawRoomThree();
+  winPlatform();
+}
+void setupRoomThree() {  //To define the room
+  //Scrambles lightroom puzzle
+  for (int i=0; i<20; i++) {
+    int puzzleBoxX=(int)random(0, 7);
+    int puzzleBoxY=(int)random(0, 5);
+    roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY];
+    if (puzzleBoxX>0)
+      roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY];
+    if (puzzleBoxY>0)
+      roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1];
+    if (puzzleBoxX<6)
+      roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY];
+    if (puzzleBoxY<4)
+      roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
+  }
+
+  //Splits the room
+  for (int i=0; i<12; i++)playerMap[12][i]=1;
+
+  playerMap[12][1]=0;  //An exit hole for the ice puzzle
+
+  //minigames
+  playerMap[6][3]=8;
+  noteMap[6][3]="3";
+  playerMap[6][5]=8;
+  noteMap[6][5]="4";
+  playerMap[6][7]=8;
+  noteMap[6][7]="8";
+  playerMap[6][9]=8;
+  noteMap[6][9]="5";
+
+  //Note
+  playerMap[2][2]=4;
+  noteMap[2][2]="Nice to see you beat my second\n"
+    +"room without any help my subject,\n"
+    +"but until now it's been a test of\n"
+    +"problem solving. I think we should\n"
+    +"spice it up for the final room, how\n"
+    +"about some tests of skill.";
+  playerMap[12][6]=5;  //Locked wall
+  lockPassKey[12][6]=3485;  //Wall passcode
+  //TODO add notes to this room
+}
+void drawRoomThree() {  //An alternative to guiPopup specifically for room three
+  int squareX=characterX/32;  //gets the x and y position of the character
+  int squareY=characterY/32;
+  if (lastMove=='w')
+    squareY--;  //looks at the square that the user is facing
+  else if (lastMove=='a')
+    squareX--;
+  else if (lastMove=='s')
+    squareY++;
+  else if (lastMove=='d')
+    squareX++;
+  squareX=max(0, squareX);  //To prevent crashes
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==8) {  //If clicked on a minigame
+    if (squareX==6&&squareY==3) {  //At square (6,3)
+      if (hasMenuOpen) {  //turns to true if user presses space
+
+        boolean allLightsOn=true;  //Checks if all lights are blue
+        for (int i=0; i<7; i++) {
+          for (int j=0; j<5; j++) {
+            if (!roomThreeLightPuzzle[i][j]) {
+              allLightsOn=false;
+              break;
+            }
+          }
+        }
+
+        if (timeSolved!=-1&&millis()-timeSolved>1000) {  //Lets the screen appear for one second when solved
+          hasMenuOpen=false;
+          timeSolved=-1;
+          playerMap[6][3]=4;
+        }
+        if (allLightsOn) {
+          for (int i=0; i<7; i++) {
+            for (int j=0; j<5; j++) {
+              fill(100, 200, 100);
+              rect(i*40+250, j*40+120, 32, 32);  //Draws all colours to green and starts the one second times
+              if (timeSolved==-1) {
+                timeSolved=millis();
+              }
+            }
+          }
+        } else {
+          //Displays the lights that are on and the ones that are not
+          for (int i=0; i<7; i++) {
+            for (int j=0; j<5; j++) {
+              if (roomThreeLightPuzzle[i][j]) {
+                fill(100, 100, 200);
+              } else {
+                fill(230);
+              }
+              rect(i*40+250, j*40+120, 32, 32);
+            }
+          }
+
+          //Turn the mouse coordinates into coordinates for light puzzle
+          int puzzleBoxX=(mouseX-250)/40;
+          int puzzleBoxY=(mouseY-120)/40;
+          if (mouseX>=250&&mouseX<=522&&mouseY>=120&&mouseY<=312) {  //Set boundaries to prevent crashing from array out of bounds
+            fill(100, 200);  //Highlight box under mouse
+            rect(puzzleBoxX*40+250, puzzleBoxY*40+120, 32, 32);
+            if (mousePressed) {
+              mouseBeenPressed=true;
+            } else {
+              if (mouseBeenPressed) {  //If released
+                roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY];  //flips the states between the box and adjecent boxes
+                if (puzzleBoxX>0)
+                  roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX-1][puzzleBoxY];
+                if (puzzleBoxY>0)
+                  roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY-1];
+                if (puzzleBoxX<6)
+                  roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY]=!roomThreeLightPuzzle[puzzleBoxX+1][puzzleBoxY];
+                if (puzzleBoxY<4)
+                  roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1]=!roomThreeLightPuzzle[puzzleBoxX][puzzleBoxY+1];
+              }
+              mouseBeenPressed=false;
+            }
+          }
+        }
+        fill(0);
+        textSize(28);
+        text("Turn all to blue.", 280, 390);
+      }
+    } else if (squareX==6&&squareY==5) {  //On square (6,5) stacker mini game
+      if (hasMenuOpen) {
+        noStroke();
+        //Draws the grid, blocks, and a red line on the second row from the top
+        for (int i=0; i<6; i++) {
+          for (int j=0; j<8; j++) {
+            fill(230);
+            if (roomThreeStacker[i][j]) {
+              fill(100);
+            }
+            if (j==1)fill(200, 100, 100);
+            rect(i*40+300, j*40+80, 32, 32);
+          }
+        }
+
+        //If user stacks to the red line
+        if (roomThreeStackerLayer==0) {
+          for (int i=0; i<6; i++) {  //Draw board green
+            for (int j=0; j<8; j++) {
+              fill(100, 200, 100);
+              rect(i*40+300, j*40+80, 32, 32);
+            }
+          }
+          if (millis()-timeSolved>1000) {  //Wait 1 second and changes screen
+            hasMenuOpen=false;
+            timeSolved=-1;
+            playerMap[6][5]=4;
+          }
+        } else {
+          fill(100);
+          if (timeSolved==-1)
+            timeSolved=millis();  //The internal clock for the bouncing block
+          if (millis()-timeSolved>100) {
+            if (roomThreeStackerPos==0)
+              roomThreeIsGoingRight=true;  //Alternates between going left are right
+            if (roomThreeStackerPos==5)
+              roomThreeIsGoingRight=false;
+              
+            if (roomThreeIsGoingRight) {
+              roomThreeStackerPos++;  //Moves the block accordingly
+            } else {
+              roomThreeStackerPos--;
+            }
+            timeSolved=millis();  //resets internal clock
+          }
+          rect(roomThreeStackerPos*40+300, 80, 32, 32);  //Draws block
+          if (keyPressed&&key==' ') {
+            if (!spaceBeenPressed) {  //If mouse pressed but runs only once
+              if (roomThreeStackerLayer==8)
+                roomThreeStackerLayer--;  //Preventing errors
+              else {
+                if (roomThreeStackerLayer==7||roomThreeStacker[roomThreeStackerPos][roomThreeStackerLayer+1]) {  //The mechanic to make sure you are able to place the block
+                  roomThreeStacker[roomThreeStackerPos][roomThreeStackerLayer--]=true;  //Places block
+                  if (roomThreeStackerLayer==0)
+                    timeSolved=millis();  //If beaten game start 1 second delay
+                } else {
+                  roomThreeStackerLayer=7;  //Resets to beginning
+                  for (int i=0; i<6; i++) {
+                    for (int j=0; j<8; j++) {
+                      roomThreeStacker[i][j]=false;  //Resets map
+                    }
+                  }
+                }
+              }
+            }
+            spaceBeenPressed=true;
+          } else {
+            spaceBeenPressed=false;
+          }
+        }
+      }
+    } else if (squareX==6&&squareY==7) {  //Reaction minigame
+      if (hasMenuOpen) {
+        noStroke();
+        textSize(28);
+        fill(0);
+        text("Click\n<=250ms", 150, 250);
+        if (roomThreeReactionTime<=250&&roomThreeReactionTime!=0&&!roomThreeButtonOn) {  //If player clickes the green button under 250ms 
+          fill(100, 200, 100);
+          ellipse(400, 250, 250, 250);
+          text(roomThreeReactionTime+" ms", 375, 100);
+          if (millis()-timeSolved>1000) {  //Wait one second before exiting menu
+            hasMenuOpen=false;
+            timeSolved=-1;
+            playerMap[6][7]=4;
+          }
+        } else if (roomThreeButtonOn) {  //If green button
+          roomThreeReactionTime=millis()-timeSolved;
+          text(roomThreeReactionTime+" ms", 375, 100);  //Display time elasped
+          if (roomThreeReactionTime>1000) {  //If over one second, reset timer
+            roomThreeButtonOn=false;
+            timeSolved=millis();
+          }
+          if (mousePressed||(keyPressed&&key==' ')) {  //Resets internal time and button state
+            roomThreeButtonOn=false;
+            timeSolved=millis();
+            spaceBeenPressed=true;
+          }
+          fill(100, 200, 100);
+          ellipse(400, 250, 250, 250);
+        } else {  //If button red
+          if (!keyPressed||timeSolved!=-1) {  //If player is ready
+            if (timeSolved==-1)
+              timeSolved=millis();  //Error trapping
+
+            if (millis()-timeSolved>3000+random(0, 2000)) {  //After waiting the button to be red between 3-5 sec it will turn green and start the clock
+              roomThreeButtonOn=true;
+              timeSolved=millis();
+            }
+            fill(200, 100, 100);
+            if (mousePressed||(keyPressed&&key==' ')) {  //Resets timer if player clicks on red
+              timeSolved=millis();
+              if (!spaceBeenPressed) 
+                fill(0);  //Prevents the mouse press from previous attempt from turning black
+            } else if (!mousePressed||(keyPressed&&key==' ')) {  //If mouse released allow the player their next attempt
+              spaceBeenPressed=false;
+            }
+          } else {
+            fill(200, 100, 100);
+          }
+          ellipse(400, 250, 250, 250);
+          fill(0);
+          if (roomThreeReactionTime<1000&&roomThreeReactionTime!=0)
+            text(roomThreeReactionTime+" ms", 375, 100);
+          else 
+            text("000 ms", 375, 100);
+        }
+      }
+    } else if (squareX==6&&squareY==9) {
+      if (hasMenuOpen) {
+        stroke(0);
+        if (roomThreeClickScore==90) {  //If player clicks 90 times
+          fill(100, 200, 100);
+          text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
+          //deal with stroke
+          rect(180, 120, 440, 250);
+          if (millis()-timeSolved>1000) {  //Wait one second then 
+            hasMenuOpen=false;
+            timeSolved=-1;
+            playerMap[6][9]=4;
+          }
+        } else {
+          roomThreeReactionTime=millis()-timeSolved;  //Reusing a variable as time elasped
+          if (roomThreeReactionTime>10000) {  //If time is over 10 sec reset the time and score
+            timeSolved=-1;
+            roomThreeClickScore=0;
+          }
+          fill(0);
+          if (timeSolved==-1)
+            text(roomThreeClickScore+" Clicks    0.000 Sec", 200, 100);
+          else
+            text(roomThreeClickScore+" Clicks    "+roomThreeReactionTime/1000.0+" Sec", 200, 100);
+
+          if (mousePressed) {
+            if (mouseBeenPressed&&timeSolved!=-1) {//Increments the score by one
+              mouseBeenPressed=false;
+              roomThreeClickScore++;
+            } else if (timeSolved==-1) {  //Begins timer
+              timeSolved=millis();
+            }
+            fill(230);
+          } else {
+            mouseBeenPressed=true;
+            if (timeSolved==-1) {  //Displays only when not clicking 
+              text("Click 90 times in 10 seconds", 200, 250);
+            }
+            noFill();
+          }
+          if (roomThreeClickScore==90)timeSolved=millis();  //Sets timer for the 1 second till exit
+          rect(180, 120, 440, 250);
+        }
+      }
+    }
+  } else {
+    //Extra precautionary measure
+    timeSolved=-1;
+    roomThreeReactionTime=0;
+  }
+}
+void roomTwo() {  //room two
+  drawMap();
+  timeElasped();
+  image(roomTwoShape, 32, 224);  //Draws image with the map
+  moveCharacter();
+  guiPopup();
+  drawRoomTwo();
+  winPlatform();
+}
+void setupRoomTwo() {  //Setup room two
+  for (int i=0; i<25; i++)playerMap[i][6]=1;  //Add walls
+  for (int i=1; i<12; i++) {
+    playerMap[8][i]=1;
+    playerMap[16][i]=1;
+  }
+
+  playerMap[4][3]=4;  //Note
+  noteMap[4][3]="Welcome to your second room,\n"
+    +"in here we'll go back to the basics.\n"
+    +"1, 2, 3, 16, pineapple?";
+  playerMap[8][3]=5;  //Locked wall
+  lockPassKey[8][3]=5694;  //Passcode
+  playerMap[12][3]=4;  //Note
+  noteMap[12][3]="Good luck getting out of\n"
+    +"this room if you think it's that\n"
+    +"straight forward. You'll need to\n"
+    +"think out of the room for this one.\n"
+    +"Or do you call it out of the box?";
+  playerMap[12][6]=5;  //Locked wall
+  lockPassKey[12][6]=7219;  //Passcode
+  playerMap[12][9]=4;  //Note
+  noteMap[12][9]="Story idea,\n\n"
+    +"Till recently, Issac's artistic naming gave\n"
+    +"lasting echos. Since questions ultimately\n"
+    +"arose relating equally. People eventually\n"
+    +"named the artist Galvin on November.\n"
+    +"Carrying its reasons can leave evidence";
+  playerMap[16][9]=5;  //Locked Wall
+  lockPassKey[16][9]=7557;  //Passcode
+  playerMap[20][9]=4;  //Note with an image
+  playerMap[20][6]=5;  //Locked Wall
+  lockPassKey[20][6]=5259;  //Passcode
+  for (int i=17; i<24; i++) {
+    for (int j=1; j<6; j++)playerMap[i][j]=6;  //Sets an area as ice
+  }
+  playerMap[20][4]=1;  //Added walls for ice puzzle
+  playerMap[23][5]=1;
+  playerMap[22][2]=1;
+  playerMap[21][1]=1;
+  playerMap[17][4]=1;
+  playerMap[18][5]=1;
+  playerMap[18][2]=7;  //Win platform
+}
+void drawRoomTwo() {  //guiPopup alternative for room two
+  int squareX=characterX/32;  //Block coordinates
+  int squareY=characterY/32;
+  if (lastMove=='w')
+    squareY--;
+  else if (lastMove=='a')
+    squareX--;
+  else if (lastMove=='s')
+    squareY++;
+  else if (lastMove=='d')
+    squareX++;  //Coordinates of the block which the player is facing to
+  squareX=max(0, squareX);  //Error trapping
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==4) {  //If facing a note
+    if (squareX==4&&squareY==3) {  //If facing square (4,3)
+      if (hasMenuOpen) {
+        image(roomTwoColourPuzzle, 0, 0);  //Draw image ontop on note message
+      }
+    } else if (squareX==12&&squareY==3) {  //If facing square (12,3)
+      if (hasMenuOpen) {
+        println(" --   --        --");    //Print this in console as the next code
+        println("   |    |    | |   |");
+        println("      --        --");
+        println("   | |       |     |");
+        println("      --        --");
+      }
+    } else if (squareX==20&&squareY==9) {
+      if (hasMenuOpen) {
+        image(roomTwoCodePuzzle, 0, 0);  //Draws image if facing square (20,9)
+      }
     }
   }
 }
-void colourPickerSample() {
+void roomOne() {  //Room one
+  drawMap();
+  timeElasped();
+  moveCharacter();
+  guiPopup();
+  drawRoomOne();
+  winPlatform();
+}
+void setupRoomOne() {  //Setup room one items
+  for (int i=8; i<24; i++) {
+    for (int j=1; j<6; j++)playerMap[i][j]=6;
+  }
+  for (int i=14; i<24; i++) {
+    for (int j=6; j<12; j++)playerMap[i][j]=6;  //Set two areas of ice
+  }
+  for (int i=0; i<7; i++)playerMap[7][i]=1;  //Walls
+  for (int i=0; i<14; i++)playerMap[i][6]=1;
+  for (int i=0; i<13; i++)playerMap[13][i]=1;
+  playerMap[5][1]=4;  //Note
+  noteMap[5][1]="Hello Subject 1342,\n"
+    +"Welcome to my escape room! A\n"
+    +"game where you are stuck in a room\n"
+    +"and you have to solve puzzles\n"
+    +"to escape and move on to the next.\n"
+    +"To escape your first room, you\n"
+    +"need to forget who you were and\n"
+    +"focus on who you are now.\n";
+  playerMap[3][6]=5;   //Locked Wall
+  lockPassKey[3][6]=1342;  //Passcode
+  playerMap[3][9]=4;  //Note
+  noteMap[3][9]="";
+  playerMap[6][9]=4;  //Note
+  noteMap[6][9]="\n\n\n\n\n\n\nT is the first letter.";
+  playerMap[10][9]=4;  //Note
+  noteMap[10][9]="Good job my subject,\n"
+    +"time for your next puzzle. Most\n"
+    +"of my other subjects usually can't\n"
+    +"get past this point. I wonder if\n"
+    +"you're like my other subjects.";
+  playerMap[10][6]=5;  //Locked Wall
+  lockPassKey[10][6]=3740;  //Passcode
+  playerMap[8][3]=4;  //Note
+  noteMap[8][3]="This will be the last message\n"
+    +"you\'ll be hearing from me\n"
+    +"until you get to the end.\n"
+    +"If you ever do.";
+  playerMap[13][3]=6;  //Ice to bridge between the two areas
+  playerMap[10][4]=1;  //Walls for the ice puzzle
+  playerMap[11][2]=1;
+  playerMap[10][4]=1;
+  playerMap[11][2]=1;
+  playerMap[19][3]=1;
+  playerMap[15][7]=1;
+  playerMap[14][2]=1;
+  playerMap[21][1]=1;
+  playerMap[21][8]=1;
+  playerMap[22][4]=1;
+  playerMap[16][11]=1;
+  playerMap[18][4]=1;
+  playerMap[17][2]=1;
+  playerMap[18][10]=1;
+  playerMap[19][9]=1;
+  playerMap[23][5]=1;
+  playerMap[17][8]=1;
+  playerMap[19][11]=1;
+  playerMap[22][10]=7;  //Win platform
+}
+void drawRoomOne() {  //An alternative to guiPopup for room one
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  if (lastMove=='w')
+    squareY--;
+  else if (lastMove=='a')
+    squareX--;
+  else if (lastMove=='s')
+    squareY++;
+  else if (lastMove=='d')
+    squareX++;  //Get the coordinates that player is facing
+  squareX=max(0, squareX);  //Error trap
+  squareY=max(0, squareY);
+  if (playerMap[squareX][squareY]==4) {
+    if (squareX==3&&squareY==9) {
+      if (hasMenuOpen) {
+        image(roomOneGrid, 0, 0);  //Draw image if facing at square(3,9)
+      }
+    } else if (squareX==6&&squareY==9) {
+      if (hasMenuOpen) {
+        image(roomOneGridPuzzle, 0, 0);  //Draw image if facing at square (6,9)
+      }
+    }
+  }
+}
+void timeElasped() {  //Displays the time elasped while playing
+  secondElasped=second()-startSec;  //Get time elasped
+  minuteElasped=minute()-startMin;
+  hourElasped=hour()-startHr;
+  if (secondElasped<0) {  //Carrying over the for negative numbers
+    secondElasped+=60;
+    minuteElasped--;
+  }
+  if (minuteElasped<0) {
+    minuteElasped+=60;
+    hourElasped--;
+  }
+  if (hourElasped<0) {
+    hourElasped+=24;
+  }
+
+  String outputLine="";  //To have the output as 01:00:11 instead of 1:0:11
+  if (hourElasped<10)
+    outputLine+="0"+hourElasped+":";
+  else 
+    outputLine+=hourElasped+":";
+  if (minuteElasped<10)
+    outputLine+="0"+minuteElasped+":";
+  else 
+    outputLine+=minuteElasped+":";
+  if (secondElasped<10)
+    outputLine+="0"+secondElasped;
+  else 
+    outputLine+=secondElasped;
+
+  text("Time "+outputLine, 20, 470);
+}
+void guiPopup() {  //Any item which the player can interact in the rooms can popup
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  if (lastMove=='w')
+    squareY--;
+  else if (lastMove=='a')
+    squareX--;
+  else if (lastMove=='s')
+    squareY++;
+  else if (lastMove=='d')
+    squareX++;  //Get square player is face to
+  squareX=max(0, squareX);
+  squareY=max(0, squareY);  //Error trap
+  if (playerMap[squareX][squareY]==4) {  //If the player is facing a note
+    if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {  //Open menu when space is pressed
+      hasMenuOpen=true;
+      noteMessage="";  //Clears previous message
+      spaceBeenPressed=false;
+    }
+    if (hasMenuOpen) {
+      image(paperNote, 0, 0);  //Draw gui image
+      PFont font = loadFont("YuGothicUI-Bold-48.vlw");
+      textFont(font);
+      textSize(30);
+      if (noteMessage.length()!=noteMap[squareX][squareY].length()) {  //If the length of the noteMessage on screen is not the same length as the note shown
+        noteMessage+=noteMap[squareX][squareY].charAt(noteMessage.length());//This creates the typing effect
+        fill(0);
+        text(noteMessage+"_", 150, 100);
+      } else {
+        fill(100);
+        text("Press any key to continue...", 200, 425);
+        fill(0);
+        text(noteMessage, 150, 100);
+      }
+
+      if (mousePressed||(keyPressed&&(key!=' '||spaceBeenPressed)))
+        hasMenuOpen=false;  //Exit note if space is pressed or any other key is
+      if (!keyPressed||key!=' ')
+        spaceBeenPressed=true;  //Toggle to true when mouse released
+    } else {
+      if (!keyPressed||key!=' ')
+        spaceBeenPressed=false;  //Toggle to false when menu is not open
+    }
+  } else if (playerMap[squareX][squareY]==5) {  //If the player is facing a Locked wall
+    if (keyPressed&&key==' '&&!hasMenuOpen&&!spaceBeenPressed) {  //If user presses space
+      hasMenuOpen=true;
+      spaceBeenPressed=false;
+      for (int i=0; i<4; i++) {  //Resets all values 
+        finalValue[i]=0;
+        curValue[i]=0;
+        scrollX[i]=0;
+        distance[i]=0;
+      }
+      colourSection=0;  
+      shackleY=0;
+      numComb=0;
+      hasUnlocked=false;
+    }
+    if (hasMenuOpen) {
+      //Drawing the boarder
+      strokeWeight(10);
+      fill(240);
+      stroke(0);
+      rect(96, 32, 608, 384);
+      fill(100);
+      textSize(30);
+      text("Press\nany\nkey\nto\ncontinue", 125, 200);
+      textSize(20);
+      strokeWeight(28);
+      noFill();
+      stroke(0);
+
+      if (hasUnlocked) {
+        stroke(100, 200, 100);  //Turn green if got right code
+      }
+      arc(400, 150-shackleY, 200, 200, PI, 2*PI);  //Draws the lock and shackle
+      line(300, 150-shackleY, 300, 200);
+      line(500, 150-shackleY, 500, 200-shackleY);
+      strokeWeight(1);
+      fill(0);
+      if (hasUnlocked) {
+        fill(100, 200, 100);
+      }
+      rect(250, 200, 300, 200, 14);
+      strokeWeight(2);
+      stroke(255);
+      line(270, 292, 280, 292);
+      line(520, 292, 530, 292);
+      strokeWeight(1);
+
+
+      if (!hasUnlocked) {  //If not unlocked
+        int wheelNum=(mouseX-305)/50;  //You get the dial the mouse is on
+        if (wheelNum>=0&&wheelNum<=3&&mouseX>=30&&mouseX<=495) {  //If within range
+
+          if (mousePressed) {
+            distance[wheelNum]=scrollX[wheelNum]-mouseY;  //Converts the distance between current and before Y positions and gets the number of dials it needs to move
+            distance[wheelNum]/=15;
+            if (distance[wheelNum]<0)
+              distance[wheelNum]+=10;  //To account for modulus in negative numbers
+            distance[wheelNum]%=10;
+            curValue[wheelNum]=distance[wheelNum]+finalValue[wheelNum];  //curValue will be the value the user sees. The addition of distance and finalValue will correctly move the dial around
+          } else {
+            scrollX[wheelNum]=mouseY;  //Will set the start Y value of your mouse before moving dial
+            finalValue[wheelNum]=curValue[wheelNum];  //To save the value before moving dials again
+          }
+          if (curValue[wheelNum]<0)
+            curValue[wheelNum]+=10;  //To account for modulus in negative numbers
+          curValue[wheelNum]%=10;
+        }
+      } else {  //If unlocked
+        shackleY=min(40, shackleY+2);  //Opening animation
+        if (shackleY==40) {
+          hasMenuOpen=false;
+          delay(2000);
+          playerMap[squareX][squareY]=0;
+        }
+      }
+      numComb=0;  //The value of the combination
+      boolean isInOneSection=false;  //If the mouse is on any dial
+      for (int j=0; j<4; j++) {  //For each of the dials
+        if (mouseX>=305+50*j&&mouseX<=345+50*j&&(mousePressed||(mouseY>=250&&mouseY<=340))&&!hasUnlocked) {  //If on a dial
+          isInOneSection=true;
+          fill(255-min(255, colourSection));  //Makes shading effect
+          stroke(255-min(255, colourSection));
+          rect(305+50*j, 250, 40, 90);
+          fill(min(255, colourSection));
+          stroke(min(255, colourSection));
+          colourSection+=10;
+        } else {
+          fill(255);
+          stroke(255);
+          rect(305+50*j, 250, 40, 90);
+          fill(0);
+        }
+        for (int i=0; i<3; i++) {
+          text((i+curValue[j])%10, 320+50*j, 300+30*(i-1));  //Displays the value below, above, and between
+        }
+        numComb*=10;  //To get the final value
+        numComb+=(1+curValue[j])%10;
+      }
+      if (!isInOneSection)
+        colourSection=0;  //If mouse not on any dial reset the shading effect
+      if (lockPassKey[squareX][squareY]==numComb)
+        hasUnlocked=true;  //is the passcode and combination are the same
+      if (keyPressed&&(key!=' '||spaceBeenPressed))
+        hasMenuOpen=false;  //If pressed any key close popup
+      if (!keyPressed||key!=' ')
+        spaceBeenPressed=true;  //Toggle space bar
+    } else {
+      if (!keyPressed||key!=' ')
+        spaceBeenPressed=false;  //Toggle space bar
+    }
+  } else if (playerMap[squareX][squareY]==3) {  //Toggle button
+    if (keyPressed&&key==' ') {
+      if (spaceBeenPressed) {  //If space released
+        roomThreeMapButtonOn=!roomThreeMapButtonOn;  //Flip state of this variable which controls the appearence of walls
+        spaceBeenPressed=false;
+      }
+    } else {
+      spaceBeenPressed=true;
+    }
+  } else if (playerMap[squareX][squareY]==8) {  //mini games
+    if (keyPressed&&key==' '&&!hasMenuOpen) {  //When space is pressed
+      hasMenuOpen=true;
+      roomThreeStackerLayer=8;  //Resets
+    }
+    if (hasMenuOpen) {
+      image(paperNote, 0, 0);
+      PFont font = loadFont("YuGothicUI-Bold-48.vlw");
+      textFont(font);
+      textSize(30);
+      fill(100);
+      text("Press any key to continue...", 200, 425);
+      if (keyPressed&&key!=' ')
+        hasMenuOpen=false;
+    }
+  }
+}
+
+void drawMap() {  //Where the values in playerMap are used to draw the game
+  background(100);
+  for (int i=0; i<25; i++) {
+    for (int j=0; j<13; j++) {  //For every square
+      if (playerMap[i][j]!=1) {
+        if ((i+j)%2==0) {  //Creates a checkered pattern
+          stroke(#000080);
+          fill(#000080);
+          rect(32*i, 32*j, 31, 31);
+        } else {
+          stroke(#add8e6);
+          fill(#add8e6);
+          rect(32*i, 32*j, 31, 31);
+        }
+      }
+      if (playerMap[i][j]==1) {  //Wall
+        stroke(200);
+        fill(200);
+        rect(32*i, 32*j, 31, 31);
+      } else if (playerMap[i][j]==3) {  //Toggleable button
+        fill(200);
+        stroke(200);
+        ellipse(32*i+16, 32*j+16, 15, 15);
+      } else if (playerMap[i][j]==4) {  //Note
+        image(note, 32*i, 32*j);
+      } else if (playerMap[i][j]==5) {  //Locked wall
+        image(lockedWall, 32*i, 32*j);
+      } else if (playerMap[i][j]==7) {  //Win platform
+        stroke(100, 200, 100);
+        fill(100, 200, 100);
+        rect(32*i, 32*j, 31, 31);
+      } else if (playerMap[i][j]==6) {  //Ice Floor
+        stroke(200);
+        fill(200);
+        rect(32*i, 32*j, 31, 31);
+        image(iceFloor, 32*i, 32*j);
+      } else if (playerMap[i][j]==8) {  //Joystick Icon
+        image(miniGame, 32*i, 32*j);
+      }
+    }
+  }
+  //Includes the MainMenu and Restart button
+  fill(100, 100, 200);
+  stroke(100, 100, 200);
+  if (mouseX>=340&&mouseX<=500&&mouseY>=430&&mouseY<=480) {
+    fill(150, 150, 250);  //Highlights when hover over with mouse
+    stroke(150, 150, 250);
+    if (isMouseReleased) {
+      currentWindow=2;  //Goes to playGame which goes to the right room
+      delay(100);
+    }
+  } else {
+    fill(100, 100, 200);
+    stroke(100, 100, 200);
+  }
+  rect(340, 430, 160, 50);
+  if (mouseX>=540&&mouseX<=770&&mouseY>=430&&mouseY<=480) {
+    fill(150, 150, 250);  //Highlights when hover over with mouse
+    stroke(150, 150, 250);
+    if (isMouseReleased)
+      currentWindow=1;  //Goes to mainMenu)=
+  } else {
+    fill(100, 100, 200);
+    stroke(100, 100, 200);
+  }
+  rect(540, 430, 230, 50);
+  fill(255);
+  textSize(40);
+  text("Restart", 350, 470);
+  text("Main Menu", 550, 470);
+}
+void moveCharacter() {  //Controls the character and displays the walking animation
+
+  if (hasControl) {
+    if (lastMove=='w') 
+      characterBackIdle();  //Draws the position the character is facing based on the last pressed
+    if (lastMove=='a') 
+      characterLeftIdle();
+    if (lastMove=='s') 
+      characterFwdIdle();
+    if (lastMove=='d') 
+      characterRightIdle();
+    if (!hasMenuOpen) {  //Prevents interference with the guiPopup
+      if (keyPressed) {
+        if (key=='w'||(key==CODED&&keyCode==UP)) {  //If these keys are pressed the user then loses control so the animation can happen
+          lastMove='w';
+          hasControl=false;
+        }
+        if (key=='a'||(key==CODED&&keyCode==LEFT)) {
+          lastMove='a';
+          hasControl=false;
+        }
+        if (key=='s'||(key==CODED&&keyCode==DOWN)) {
+          lastMove='s';
+          hasControl=false;
+        }
+        if (key=='d'||(key==CODED&&keyCode==RIGHT)) {
+          lastMove='d';
+          hasControl=false;
+        }
+      }
+      characterGridX=characterX/32;  //Reset animation values
+      characterGridY=characterY/32;
+      moveCharacterMoves=0;
+      moveCharacterFrame=0;
+    }
+  } else {
+    if (!hasMenuOpen) {
+      //This is responsible for the movement and animation of the character. Every statement is similar
+      if (lastMove=='w') {
+        if (moveCharacterFrame++==0) {  //Responsible for character animation
+          moveCharacterMoves++;
+          characterY-=2;
+        }
+        if (moveCharacterMoves%2==0) 
+          characterBackOne();  //Draws either the character stepping left or right
+        else 
+          characterBackTwo();
+        if (playerMap[characterGridX][characterGridY-1]!=0  //Allows the character to walk on floor, ice, and win platform
+          &&playerMap[characterGridX][characterGridY-1]!=6
+          &&playerMap[characterGridX][characterGridY-1]!=7) {
+
+          if (moveCharacterMoves>4) {  //Creates the rubber band effect of when hitting a wall
+            characterY+=10;
+            hasControl=true;  //Give user controls
+          }
+        }
+      }
+      if (lastMove=='a') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterX-=2;
+        }
+        if (moveCharacterMoves%2==0) 
+          characterLeftOne();
+        else 
+          characterLeftTwo();
+        if (playerMap[characterGridX-1][characterGridY]!=0
+          &&playerMap[characterGridX-1][characterGridY]!=6
+          &&playerMap[characterGridX-1][characterGridY]!=7) {
+
+          if (moveCharacterMoves>4) {
+            characterX+=10;
+            hasControl=true;
+          }
+        }
+      }
+      if (lastMove=='s') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterY+=2;
+        }
+        if (moveCharacterMoves%2==0)   
+          characterFwdOne();
+        else 
+          characterFwdTwo();
+        if (playerMap[characterGridX][characterGridY+1]!=0
+          &&playerMap[characterGridX][characterGridY+1]!=6
+          &&playerMap[characterGridX][characterGridY+1]!=7) {
+          if (moveCharacterMoves>4) {
+            characterY-=10;
+            hasControl=true;
+          }
+        }
+      }
+      if (lastMove=='d') {
+        if (moveCharacterFrame++==0) {
+          moveCharacterMoves++;
+          characterX+=2;
+        }
+        if (moveCharacterMoves%2==0) 
+          characterRightOne();
+        else 
+          characterRightTwo();
+        if (playerMap[characterGridX+1][characterGridY]!=0
+          &&playerMap[characterGridX+1][characterGridY]!=6
+          &&playerMap[characterGridX+1][characterGridY]!=7) {
+          if (moveCharacterMoves>4) {
+            characterX-=10;
+            hasControl=true;
+          }
+        }
+      }
+      moveCharacterFrame%=1; //This will be the FPS of the character higher the value is, the slower the movement
+      if (moveCharacterMoves==16) {  //When the character moved a full square
+        characterGridX=characterX/32;  //Update characterGrid coordinates
+        characterGridY=characterY/32;
+        if (playerMap[characterGridX][characterGridY]==0  //If not ice then give user control.
+          ||playerMap[characterGridX][characterGridY]==7)
+          hasControl=true;
+        moveCharacterMoves=0;  //Reset values
+        moveCharacterFrame=0;
+      }
+    }
+  }
+}
+void resetRoom() {  //Resets each room
+  hasControl=true;  //Resets all values
+  lastMove='d';
+  colourSection=0;
+  shackleY=0;
+  numComb=0;
+  hasMenuOpen=false;
+  for (int i=0; i<4; i++) {
+    finalValue[i]=0;
+    curValue[i]=0;
+    scrollX[i]=0;
+    distance[i]=0;
+  }
+  for (int i=0; i<25; i++) {
+    for (int j=0; j<13; j++) {
+      playerMap[i][j]=0;
+      noteMap[i][j]="";
+      lockPassKey[i][j]=0;
+    }
+  }
+  for (int i=0; i<25; i++)playerMap[i][0]=1;  //Set borders to rooms
+  for (int i=0; i<25; i++)playerMap[i][12]=1;
+  for (int i=0; i<13; i++)playerMap[0][i]=1;
+  for (int i=0; i<13; i++)playerMap[24][i]=1;
+}
+void winPlatform() {  //Will transition to winscreen if player stands on winplatform
+  int squareX=characterX/32;
+  int squareY=characterY/32;
+  if (playerMap[squareX][squareY]==7) {
+    currentWindow=7;  //Changes the screenstate if the player stands on the win platform (7)
+  }
+}
+void winScreen() {  //Will display when player stands on win platform
+
+  textSize(80);
+  textAlign(CENTER);
+  text("Room "+numToWord[onLevel-8]+"\nCompleted!", 400, 100);  //say which room is completed
+  textSize(30);
+  text("Time: "+hourElasped+"h "+minuteElasped+"m "+secondElasped+"s", 400, 250);  //time elasped
+  textAlign(LEFT);
+  text("Main Menu", 50, 400);
+  if (onLevel==10)
+    text("Play Again", 600, 400);  //Added option to play again if all levels are completed
+  else
+    text("Next Level", 600, 400);
+
+  noFill();
+  strokeWeight(5);
+  if (mouseX>=45&&mouseX<=210&&mouseY>=365&&mouseY<=415) {  //If chosen to go back to mainmenu
+    rect(45, 365, 165, 50);
+    if (isMouseReleased) {
+      currentWindow=1;
+      if (onLevel==10)  //Resets if reached last level
+        onLevel=8;
+      else
+        onLevel++;
+    }
+  } else if (mouseX>=595&&mouseX<=745&&mouseY>=365&&mouseY<=415) {  //Go to next level
+    rect(595, 365, 150, 50);
+    if (isMouseReleased) {  
+      if (onLevel==10)  //resets if reached last level
+        onLevel=8;
+      else
+        onLevel++;
+      currentWindow=onLevel;
+    }
+  }
+  highestLevelReached=max(highestLevelReached, onLevel);  //Used to keep track on which levels are already unlocked
+  strokeWeight(1);
+}
+
+
+void colourPickerSample() {  //The enlarged version of the character
   stroke(0, 0, 0);
   fill(0, 0, 0);
   rect(70+characterX, 100+characterY, 9, 9);
@@ -2438,7 +2540,7 @@ void colourPickerSample() {
   fill(0, 0, 0);
   rect(240+characterX, 220+characterY, 9, 9);
 }
-void characterFwdIdle() {
+void characterFwdIdle() {  //Character standing still facing forward
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 10+characterY);
@@ -3364,7 +3466,7 @@ void characterFwdIdle() {
   fill(0, 0, 0);
   point(24+characterX, 22+characterY);
 }
-void characterFwdOne() {
+void characterFwdOne() {  //Character moving forward with left foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 10+characterY);
@@ -4290,7 +4392,7 @@ void characterFwdOne() {
   fill(0, 0, 0);
   point(24+characterX, 21+characterY);
 }
-void characterFwdTwo() {
+void characterFwdTwo() {  //Character moving forward right foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 10+characterY);
@@ -5216,7 +5318,7 @@ void characterFwdTwo() {
   fill(0, 0, 0);
   point(24+characterX, 14+characterY);
 }
-void characterBackIdle() {
+void characterBackIdle() {  //Character facing backwards standing still
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 10+characterY);
@@ -6142,7 +6244,7 @@ void characterBackIdle() {
   fill(0, 0, 0);
   point(24+characterX, 11+characterY);
 }
-void characterBackOne() {
+void characterBackOne() {  //Character facing backwards left foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 10+characterY);
@@ -7074,7 +7176,7 @@ void characterBackOne() {
   fill(0, 0, 0);
   point(24+characterX, 11+characterY);
 }
-void characterBackTwo() {
+void characterBackTwo() {  //Character facing backwards, right foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 10+characterY);
@@ -8006,7 +8108,7 @@ void characterBackTwo() {
   fill(0, 0, 0);
   point(24+characterX, 11+characterY);
 }
-void characterRightIdle() {
+void characterRightIdle() {  //Character facing right, standing still
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(8+characterX, 9+characterY);
@@ -8776,7 +8878,7 @@ void characterRightIdle() {
   fill(0, 0, 0);
   point(24+characterX, 11+characterY);
 }
-void characterRightOne() {
+void characterRightOne() {  //Character facing right, left foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(8+characterX, 9+characterY);
@@ -9609,7 +9711,7 @@ void characterRightOne() {
   fill(0, 0, 0);
   point(24+characterX, 11+characterY);
 }
-void characterRightTwo() {
+void characterRightTwo() {  //Character facing right, right foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(8+characterX, 9+characterY);
@@ -10439,7 +10541,7 @@ void characterRightTwo() {
   fill(0, 0, 0);
   point(24+characterX, 11+characterY);
 }
-void characterLeftIdle() {
+void characterLeftIdle() {  //Character facing left, standing still
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 9+characterY);
@@ -11209,7 +11311,7 @@ void characterLeftIdle() {
   fill(0, 0, 0);
   point(23+characterX, 12+characterY);
 }
-void characterLeftOne() {
+void characterLeftOne() {  //Character facing left, left foot out
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 9+characterY);
@@ -12042,7 +12144,7 @@ void characterLeftOne() {
   fill(0, 0, 0);
   point(23+characterX, 12+characterY);
 }
-void characterLeftTwo() {
+void characterLeftTwo() {  //Character facing left, right foot out.
   stroke(0, 0, 0);
   fill(0, 0, 0);
   point(7+characterX, 9+characterY);
@@ -12872,5 +12974,3 @@ void characterLeftTwo() {
   fill(0, 0, 0);
   point(23+characterX, 12+characterY);
 }
-
-//Now, you might wonder what takes thousands of line. It's the sprites, they take up about 11k lines :>
