@@ -102,7 +102,7 @@ void setup() {
   bg = loadImage("splashScreenBG.jpg");
   note = loadImage("Note.png");
   paperNote=loadImage("NotePopup.png");
-  lockedWall=loadImage("LockedEntry.png");
+  lockedWall=loadImage("lockedEntry.png");
   iceFloor=loadImage("IceFloor.png");
   miniGame=loadImage("MinigamePuzzle.png");
   roomOneGrid=loadImage("RoomOnePuzzleGrid.png");
